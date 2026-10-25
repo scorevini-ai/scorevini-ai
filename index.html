@@ -305,12 +305,12 @@
         </header>
 
         <div class="hero">
-            <span class="badge-live">TRAITEMENT SANGUIN ≥ 80%</span>
+            <span class="badge-live">TRAITEMENT SANGUIN ≥ 78%</span>
             <h1>LE TERRAIN N'APPARTIENT QU'À CEUX <span>QUI DOMINENT</span></h1>
             <p>Analyse automatisée multi-régions (Europe, Amérique, Afrique) connectée en temps réel.</p>
         </div>
 
-        <div class="section-title" id="sectionTitle">Sélections Sanglantes (Fiabilité ≥ 80%)</div>
+        <div class="section-title" id="sectionTitle">Sélections Sanglantes (Fiabilité ≥ 78%)</div>
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
@@ -333,7 +333,7 @@
                 const { data, error } = await _supabase
                     .from('predictions')
                     .select('*, matches(*, competitions(name, country))')
-                    .gte('probability', 80);
+                    .gte('probability', 78);
 
                 if (error || !data || data.length === 0) {
                     // Données de secours par défaut si la base est vide
