@@ -341,5 +341,48 @@
         </div>
     </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
+        const supabaseKey = "VOTRE_CLE_ANON_PUBLIQUE";
+        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function loadData() {
+            try {
+                const { data, error } = await _supabase.from('predictions').select('*, matches(*, competitions(name))').gte('probability', 80);
+                const grid = document.querySelector('.grid');
+                if (!grid) return;
+
+                if (error || !data || data.length === 0) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
+                            <h3 style="color: var(--text-main); margin-bottom: 0.5rem;">Aucune sélection disponible pour le moment</h3>
+                            <p style="color: var(--text-muted);">Aucun match ne satisfait actuellement le critère strict de probabilité (≥ 80%).</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = data.map(p => `
+                    <div class="card">
+                        <div class="card-header">
+                            <span>${p.matches?.competitions?.name || 'Football'}</span>
+                            <span>${new Date(p.matches?.match_date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <div class="teams">${p.market_type}</div>
+                        <div class="prediction-box">
+                            <div class="market-name">Sélection</div>
+                            <div class="market-selection">${p.selection}</div>
+                            <div class="probability">${p.probability}%</div>
+                        </div>
+                        <div class="card-footer">Pronostic actif</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Erreur de chargement", e);
+            }
+        }
+        loadData();
+    </script> 
 </body>
 </html>
