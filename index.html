@@ -3,161 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScoreVini AI 🎃 - Pronostics Football Automatisés</title>
+    <title>SCOREVINI AI — Pronostics Football Automatisés</title>
     <style>
         :root {
-            --bg-color: #0b0b0e;
-            --card-bg: #16161d;
-            --accent-red: #e50914;
-            --accent-orange: #ff7518;
-            --text-main: #f5f5f7;
-            --text-muted: #9ca3af;
-            --border-color: #2a2a35;
+            --bg-color: #050505;
+            --card-bg: #101010;
+            --accent-dark: #8B0000;
+            --accent-red: #D00000;
+            --accent-glow: #FF1B1B;
+            --border-color: #252525;
+            --text-main: #F2F2F2;
+            --text-muted: #A5A5A5;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: linear-gradient(135deg, #120305, #1f0b0e); border-bottom: 2px solid var(--accent-red); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .logo-area { display: flex; align-items: center; gap: 0.75rem; }
-        .logo-icon { font-size: 2rem; }
-        .logo-text h1 { font-size: 1.5rem; color: var(--text-main); letter-spacing: 0.5px; }
-        .logo-text span { font-size: 0.8rem; color: var(--accent-orange); font-weight: bold; text-transform: uppercase; }
-        nav { display: flex; gap: 0.5rem; background: rgba(0,0,0,0.4); padding: 0.3rem; border-radius: 50px; border: 1px solid var(--border-color); }
-        .nav-btn { background: transparent; border: none; color: var(--text-muted); padding: 0.5rem 1.25rem; border-radius: 25px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
-        .nav-btn.active, .nav-btn:hover { background: var(--accent-red); color: white; box-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
-        .header-actions { display: flex; gap: 0.75rem; align-items: center; }
-        .btn-action { background: #262630; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; }
-        .btn-action:hover { background: #353545; }
-        main { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem 1rem; }
-        .section-title { font-size: 1.4rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent-orange); padding-left: 0.75rem; }
-        .badge-rule { font-size: 0.75rem; background: rgba(255, 117, 24, 0.15); color: var(--accent-orange); padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid rgba(255, 117, 24, 0.3); }
-        .matches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
-        .match-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
-        .match-card:hover { transform: translateY(-3px); border-color: var(--accent-red); }
-        .match-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
-        .competition-tag { background: rgba(255,255,255,0.05); padding: 0.2rem 0.5rem; border-radius: 4px; }
-        .teams-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; text-align: center; }
-        .team { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-        .team-logo { width: 40px; height: 40px; background: #22222d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid var(--border-color); }
-        .team-name { font-size: 0.95rem; font-weight: 600; }
-        .match-vs { font-size: 0.8rem; color: var(--text-muted); padding: 0 0.5rem; font-weight: bold; }
-        .prediction-box { background: rgba(229, 9, 20, 0.05); border: 1px dashed rgba(229, 9, 20, 0.3); border-radius: 8px; padding: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
-        .pred-label { font-size: 0.85rem; color: var(--text-muted); }
-        .pred-value { font-weight: bold; color: var(--accent-orange); font-size: 0.95rem; }
-        .pred-prob { background: var(--accent-red); color: white; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.85rem; font-weight: bold; }
-        footer { text-align: center; padding: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; }
-        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); grid-column: 1 / -1; background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color); }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar / Navigation */
+        aside {
+            width: 260px;
+            background: linear-gradient(180deg, #0a0000 0%, var(--bg-color) 100%);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        .logo-text span {
+            color: var(--accent-red);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(208, 0, 0, 0.15);
+            color: var(--text-main);
+            border-left: 3px solid var(--accent-glow);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .search-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem;
+            border-radius: 20px;
+            color: var(--text-main);
+            width: 300px;
+            outline: none;
+        }
+
+        .search-bar:focus {
+            border-color: var(--accent-red);
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: linear-gradient(135deg, rgba(139,0,0,0.2) 0%, rgba(5,5,5,0.8) 100%), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop') center/cover;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 span {
+            color: var(--accent-glow);
+            text-shadow: 0 0 15px rgba(255,27,27,0.5);
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge-live {
+            display: inline-block;
+            background: rgba(208, 0, 0, 0.2);
+            color: var(--accent-glow);
+            border: 1px solid var(--accent-red);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--accent-red);
+            border-radius: 2px;
+        }
+
+        /* Predictions Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(208, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .teams {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .prediction-box {
+            background: rgba(5, 5, 5, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .market-name {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .market-selection {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .probability {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--accent-glow);
+            text-shadow: 0 0 10px rgba(255,27,27,0.3);
+        }
+
+        .card-footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--accent-glow);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo-area">
-            <div class="logo-icon">🎃</div>
-            <div class="logo-text">
-                <h1>ScoreVini AI</h1>
-                <span>Édition Halloween • Seuil ≥ 80%</span>
-            </div>
-        </div>
-        <nav>
-            <button class="nav-btn active" onclick="switchTab('accueil')">Accueil</button>
-            <button class="nav-btn" onclick="switchTab('aujourdhui')">Aujourd'hui</button>
-            <button class="nav-btn" onclick="switchTab('demain')">Demain</button>
-            <button class="nav-btn" onclick="switchTab('hier')">Hier & Bilan</button>
-        </nav>
-        <div class="header-actions">
-            <button class="btn-action" onclick="runTests()">🧪 Tests Fiabilité</button>
-        </div>
-    </header>
 
+    <!-- Barre latérale -->
+    <aside>
+        <div>
+            <div class="logo-area">
+                <div class="logo-text">SCOREVINI <span>AI</span></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active">🏠 Accueil</a></li>
+                <li><a href="#">⚡ Aujourd'hui</a></li>
+                <li><a href="#">📅 Demain</a></li>
+                <li><a href="#">📜 Historique</a></li>
+                <li><a href="#">📊 Statistiques</a></li>
+            </ul>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+            <p>ANALYSE AU SERVICE<br>DE LA VICTOIRE</p>
+        </div>
+    </aside>
+
+    <!-- Contenu Principal -->
     <main>
-        <div id="tab-content">
-            <!-- Le contenu dynamique s'affichera ici -->
+        <header>
+            <input type="text" class="search-bar" placeholder="Rechercher une équipe, une compétition...">
+            <div style="font-weight: 600; font-size: 0.9rem;">🟢 Système Actif</div>
+        </header>
+
+        <!-- Bannière Héroïque -->
+        <div class="hero">
+            <span class="badge-live">SÉLECTION STRICTE ≥ 80%</span>
+            <h1>LE TERRAIN N'APPARTIENT QU'À CEUX <span>QUI ANALYSENT</span></h1>
+            <p>Des pronostics football basés sur des données réelles, des marchés indépendants et un modèle probabiliste rigoureux.</p>
+        </div>
+
+        <!-- Section Meilleurs Pronostics -->
+        <div class="section-title">Meilleurs pronostics (Fiables)</div>
+
+        <div class="grid">
+            <!-- Exemple de carte de match 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>Ligue des Champions</span>
+                    <span>21 oct. 20:45</span>
+                </div>
+                <div class="teams">Real Madrid vs Arsenal</div>
+                <div class="prediction-box">
+                    <div class="market-name">Total de buts</div>
+                    <div class="market-selection">Plus de 1.5 buts</div>
+                    <div class="probability">86%</div>
+                </div>
+                <div class="card-footer">Pronostic actif</div>
+            </div>
+
+            <!-- Exemple de carte de match 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>Premier League</span>
+                    <span>21 oct. 21:00</span>
+                </div>
+                <div class="teams">Liverpool vs Everton</div>
+                <div class="prediction-box">
+                    <div class="market-name">Résultat du match</div>
+                    <div class="market-selection">Victoire Liverpool</div>
+                    <div class="probability">82%</div>
+                </div>
+                <div class="card-footer">Pronostic actif</div>
+            </div>
+
+            <!-- Exemple de carte de match 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>Serie A</span>
+                    <span>22 oct. 18:30</span>
+                </div>
+                <div class="teams">Inter Milan vs AC Milan</div>
+                <div class="prediction-box">
+                    <div class="market-name">Les deux équipes marquent</div>
+                    <div class="market-selection">Oui</div>
+                    <div class="probability">81%</div>
+                </div>
+                <div class="card-footer">Pronostic actif</div>
+            </div>
         </div>
     </main>
 
-    <footer>
-        <p>ScoreVini AI &copy; 2026 - Zones autorisées : Europe, Afrique, Amériques (Exclusion Asie). Moteur automatisé.</p>
-    </footer>
-
-    <script>
-        // Données initiales conformes au cahier des charges (Zones strictes, >= 80%)
-        const matchesData = [
-            { id: 1, zone: 'Europe', competition: 'Ligue 1 (France)', home: 'Paris SG', away: 'Marseille', date: 'Aujourd\'hui 21:00', prob: 88, market: 'Victoire Paris SG', status: 'À venir', score: '-' },
-            { id: 2, zone: 'Europe', competition: 'Premier League (Angleterre)', home: 'Arsenal', away: 'Chelsea', date: 'Aujourd\'hui 18:30', prob: 82, market: 'Double chance 1X', status: 'En direct', score: '1 - 0' },
-            { id: 3, zone: 'Amériques', competition: 'Liga MX (Mexique)', home: 'Club América', away: 'Cruz Azul', date: 'Demain 03:00', prob: 85, market: 'Plus de 1.5 buts', status: 'À venir', score: '-' },
-            { id: 4, zone: 'Afrique', competition: 'Botola Pro (Maroc)', home: 'Wydad Casablanca', away: 'Raja Casablanca', date: 'Hier 20:00', prob: 90, market: 'Victoire Wydad', status: 'Terminé', score: '2 - 1 (Gagné)' }
-        ];
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderContent(tabName);
-        }
-
-        function renderContent(tab) {
-            const container = document.getElementById('tab-content');
-            let filtered = [];
-            let title = '';
-
-            if (tab === 'accueil') {
-                title = 'Top Pronos (Fiabilité ≥ 80%)';
-                // Filtre strict : uniquement les pronos >= 80% et excluant l'Asie
-                filtered = matchesData.filter(m => m.prob >= 80 && m.zone !== 'Asie' && m.status !== 'Terminé');
-            } else if (tab === 'aujourdhui') {
-                title = "Matchs d'Aujourd'hui";
-                filtered = matchesData.filter(m => m.date.includes("Aujourd'hui"));
-            } else if (tab === 'demain') {
-                title = 'Matchs de Demain';
-                filtered = matchesData.filter(m => m.date.includes("Demain"));
-            } else if (tab === 'hier') {
-                title = 'Historique d\'Hier & Bilans';
-                filtered = matchesData.filter(m => m.status === 'Terminé' || m.date.includes("Hier"));
-            }
-
-            let html = `<div class="section-title">${title} <span class="badge-rule">Filtrage 80% Actif</span></div>`;
-            
-            if (filtered.length === 0) {
-                html += `<div class="empty-state">Aucun match disponible pour cette catégorie pour le moment.</div>`;
-            } else {
-                html += `<div class="matches-grid">`;
-                filtered.forEach(m => {
-                    html += `
-                        <div class="match-card">
-                            <div class="match-header">
-                                <span class="competition-tag">🌍 ${m.competition}</span>
-                                <span style="font-weight:bold; color:${m.status === 'En direct' ? 'var(--accent-red)' : 'var(--text-muted)'};">${m.status} (${m.score})</span>
-                            </div>
-                            <div class="teams-container">
-                                <div class="team">
-                                    <div class="team-logo">⚽</div>
-                                    <span class="team-name">${m.home}</span>
-                                </div>
-                                <div class="match-vs">VS</div>
-                                <div class="team">
-                                    <div class="team-logo">⚽</div>
-                                    <span class="team-name">${m.away}</span>
-                                </div>
-                            </div>
-                            <div class="prediction-box">
-                                <div>
-                                    <div class="pred-label">Pronostic conseillé :</div>
-                                    <div class="pred-value">${m.market}</div>
-                                </div>
-                                <div class="pred-prob">${m.prob}%</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-            container.innerHTML = html;
-        }
-
-        function runTests() {
-            alert("🧪 Suite de tests automatisés :\n\n✅ Règle des 80% minimum : VALIDÉE (aucun prono < 80% affiché).\n✅ Zones géographiques : VALIDÉES (Europe, Afrique, Amériques OK, Asie exclue).\n✅ Intégrité des historiques : VALIDÉE.");
-        }
-
-        // Chargement initial
-        renderContent('accueil');
-    </script>
 </body>
 </html>
