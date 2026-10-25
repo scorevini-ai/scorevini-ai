@@ -335,16 +335,11 @@
                     .select('*, matches(*, competitions(name, country))')
                     .gte('probability', 78);
 
-                if (error || !data || data.length === 0) {
-                    // Données de secours par défaut si la base est vide
-                    allPredictions = [
-                        { market_type: 'Résultat du match', selection: 'Victoire Real Madrid', probability: 88, matches: { match_date: new Date().toISOString(), competitions: { name: 'La Liga', country: 'Espagne' }, home_team: 'Real Madrid', away_team: 'Valencia' } },
-                        { market_type: 'Total de buts', selection: 'Plus de 2.5 buts', probability: 84, matches: { match_date: new Date(Date.now() + 86400000).toISOString(), competitions: { name: 'Premier League', country: 'Angleterre' }, home_team: 'Manchester City', away_team: 'Arsenal' } }
-                    ];
-                } else {
-                    allPredictions = data;
-                }
-
+               if (error || !data || data.length === 0) {
+    allPredictions = [];
+} else {
+    allPredictions = data;
+}
                 filterTab(currentFilter);
             } catch (e) {
                 console.error("Erreur de chargement", e);
