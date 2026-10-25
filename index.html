@@ -11,7 +11,6 @@
             --card-bg: #0c0707;
             --accent-blood: #8B0000;
             --accent-red: #FF0033;
-            --accent-glow: rgba(255, 0, 51, 0.6);
             --border-color: #2b0a0a;
             --text-main: #FFFFFF;
             --text-muted: #8C8C8C;
@@ -34,7 +33,6 @@
                               radial-gradient(circle at 90% 80%, rgba(255, 0, 51, 0.05) 0%, transparent 40%);
         }
 
-        /* Sidebar Horror Style */
         aside {
             width: 280px;
             background: linear-gradient(180deg, #080101 0%, var(--bg-color) 100%);
@@ -83,7 +81,6 @@
             gap: 1rem;
             padding: 0.85rem 1rem;
             color: var(--text-muted);
-            text-decoration: none;
             border-radius: 6px;
             transition: all 0.3s ease;
             font-weight: 700;
@@ -99,7 +96,6 @@
             box-shadow: inset 0 0 15px rgba(255, 0, 51, 0.2);
         }
 
-        /* Main Content */
         main {
             flex: 1;
             padding: 2.5rem;
@@ -131,7 +127,6 @@
             box-shadow: 0 0 15px rgba(255, 0, 51, 0.3), inset 0 0 10px rgba(0,0,0,0.8);
         }
 
-        /* Hero Banner Horror */
         .hero {
             background: linear-gradient(135deg, rgba(80, 0, 0, 0.6) 0%, rgba(5, 2, 2, 0.95) 100%), 
                         url('https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop') center/cover;
@@ -157,7 +152,6 @@
             font-size: 2.3rem;
             font-weight: 900;
             margin-bottom: 0.75rem;
-            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
@@ -170,7 +164,6 @@
             color: #b3b3b3;
             font-size: 1.15rem;
             max-width: 650px;
-            margin-bottom: 1.5rem;
         }
 
         .badge-live {
@@ -187,7 +180,6 @@
             box-shadow: 0 0 10px rgba(255, 0, 51, 0.3);
         }
 
-        /* Section Title */
         .section-title {
             font-family: 'Cinzel', serif;
             font-size: 1.4rem;
@@ -196,7 +188,6 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            letter-spacing: 1px;
         }
 
         .section-title::before {
@@ -207,7 +198,6 @@
             box-shadow: 0 0 10px var(--accent-red);
         }
 
-        /* Predictions Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -220,7 +210,6 @@
             border-radius: 10px;
             padding: 1.5rem;
             transition: all 0.3s ease;
-            position: relative;
             box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
 
@@ -233,7 +222,7 @@
         .card-header {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             margin-bottom: 1rem;
             border-bottom: 1px solid #1a0808;
@@ -245,7 +234,6 @@
             font-weight: 700;
             margin-bottom: 1rem;
             text-align: center;
-            letter-spacing: 0.5px;
         }
 
         .prediction-box {
@@ -292,7 +280,6 @@
 </head>
 <body>
 
-    <!-- Sidebar Horror Style -->
     <aside>
         <div>
             <div class="logo-area">
@@ -311,35 +298,31 @@
         </div>
     </aside>
 
-    <!-- Contenu Principal -->
     <main>
         <header>
-            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher une équipe, une compétition..." oninput="handleSearch()">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher équipe, pays, région..." oninput="handleSearch()">
             <div style="font-weight: 700; font-size: 0.95rem; color: #ff3333; text-shadow: 0 0 10px rgba(255,0,51,0.5);">💀 SYSTÈME ACTIF</div>
         </header>
 
-        <!-- Bannière Héroïque -->
         <div class="hero">
             <span class="badge-live">TRAITEMENT SANGUIN ≥ 80%</span>
             <h1>LE TERRAIN N'APPARTIENT QU'À CEUX <span>QUI DOMINENT</span></h1>
-            <p>Pronostics impitoyables basés sur des données mathématiques strictes et des marchés de paris indépendants.</p>
+            <p>Analyse automatisée multi-régions (Europe, Amérique, Afrique) connectée en temps réel.</p>
         </div>
 
-        <!-- Section Meilleurs Pronostics -->
         <div class="section-title" id="sectionTitle">Sélections Sanglantes (Fiabilité ≥ 80%)</div>
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Invocation des données en cours...
+                Invocation des données mondiales...
             </div>
         </div>
     </main>
 
-    <!-- Script de gestion et de connexion Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
-        const supabaseKey = sb_publishable_KyUSPjb3kZ-exriMinWgOg_8JcKlVNa; // Remplacez par votre clé publique
+        const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa"; 
         const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         let allPredictions = [];
@@ -349,23 +332,22 @@
             try {
                 const { data, error } = await _supabase
                     .from('predictions')
-                    .select('*, matches(*, competitions(name))')
+                    .select('*, matches(*, competitions(name, country))')
                     .gte('probability', 80);
 
                 if (error || !data || data.length === 0) {
-                    // Données de secours fictives si la base est vide pour tester instantanément le design
+                    // Données de secours par défaut si la base est vide
                     allPredictions = [
-                        { market_type: 'Résultat du match', selection: 'Victoire Real Madrid', probability: 88, matches: { match_date: new Date().toISOString(), competitions: { name: 'La Liga' }, home_team: 'Real Madrid', away_team: 'Valencia' } },
-                        { market_type: 'Total de buts', selection: 'Plus de 2.5 buts', probability: 84, matches: { match_date: new Date().toISOString(), competitions: { name: 'Premier League' }, home_team: 'Manchester City', away_team: 'Arsenal' } },
-                        { market_type: 'Les deux équipes marquent', selection: 'Oui', probability: 81, matches: { match_date: new Date(Date.now() + 86400000).toISOString(), competitions: { name: 'Serie A' }, home_team: 'Inter Milan', away_team: 'AC Milan' } }
+                        { market_type: 'Résultat du match', selection: 'Victoire Real Madrid', probability: 88, matches: { match_date: new Date().toISOString(), competitions: { name: 'La Liga', country: 'Espagne' }, home_team: 'Real Madrid', away_team: 'Valencia' } },
+                        { market_type: 'Total de buts', selection: 'Plus de 2.5 buts', probability: 84, matches: { match_date: new Date(Date.now() + 86400000).toISOString(), competitions: { name: 'Premier League', country: 'Angleterre' }, home_team: 'Manchester City', away_team: 'Arsenal' } }
                     ];
                 } else {
                     allPredictions = data;
                 }
 
-                renderPredictions(allPredictions);
+                filterTab(currentFilter);
             } catch (e) {
-                console.error("Erreur", e);
+                console.error("Erreur de chargement", e);
             }
         }
 
@@ -377,7 +359,7 @@
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucune victime trouvée</h3>
-                        <p style="color: var(--text-muted);">Aucun pronostic ne correspond à vos critères actuels.</p>
+                        <p style="color: var(--text-muted);">Aucun match ne correspond à cette période ou région.</p>
                     </div>
                 `;
                 return;
@@ -385,7 +367,10 @@
 
             grid.innerHTML = dataToRender.map(p => {
                 const matchDate = new Date(p.matches?.match_date || Date.now());
-                const timeStr = matchDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                const dateOptions = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
+                const dateStr = matchDate.toLocaleDateString('fr-FR', dateOptions);
+                const compName = p.matches?.competitions?.name || 'Compétition';
+                const countryName = p.matches?.competitions?.country ? ` (${p.matches.competitions.country})` : '';
                 const teamDisplay = p.matches?.home_team && p.matches?.away_team 
                     ? `${p.matches.home_team} vs ${p.matches.away_team}` 
                     : p.market_type;
@@ -393,8 +378,8 @@
                 return `
                     <div class="card">
                         <div class="card-header">
-                            <span>${p.matches?.competitions?.name || 'Football'}</span>
-                            <span>${timeStr}</span>
+                            <span>${compName}${countryName}</span>
+                            <span>${dateStr}</span>
                         </div>
                         <div class="teams">${teamDisplay}</div>
                         <div class="prediction-box">
@@ -410,28 +395,44 @@
 
         function filterTab(tab) {
             currentFilter = tab;
-            // Mise à jour visuelle des boutons de la barre latérale
             document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
             const activeBtn = document.getElementById('btn-' + tab);
             if (activeBtn) activeBtn.classList.add('active');
 
             const now = new Date();
+            const todayStr = now.toDateString();
+
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const tomorrowStr = tomorrow.toDateString();
+
             let filtered = allPredictions;
 
             if (tab === 'today') {
                 filtered = allPredictions.filter(p => {
-                    const d = new Date(p.matches?.match_date);
-                    return d.toDateString() === now.toDateString();
+                    if (!p.matches?.match_date) return false;
+                    return new Date(p.matches.match_date).toDateString() === todayStr;
                 });
             } else if (tab === 'tomorrow') {
-                const tomorrow = new Date(now);
-                tomorrow.setDate(now.getDate() + 1);
                 filtered = allPredictions.filter(p => {
-                    const d = new Date(p.matches?.match_date);
-                    return d.toDateString() === tomorrow.toDateString();
+                    if (!p.matches?.match_date) return false;
+                    return new Date(p.matches.match_date).toDateString() === tomorrowStr;
                 });
             } else if (tab === 'history') {
-                filtered = allPredictions.filter(p => new Date(p.matches?.match_date) < now);
+                filtered = allPredictions.filter(p => {
+                    if (!p.matches?.match_date) return false;
+                    const d = new Date(p.matches.match_date);
+                    return d < now && d.toDateString() !== todayStr;
+                });
+            } else if (tab === 'stats') {
+                document.getElementById('predictionsGrid').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
+                        <h3 style="color: var(--accent-red); margin-bottom: 1rem; font-family: 'Cinzel', serif; font-size: 1.8rem;">STATISTIQUES GLOBALES</h3>
+                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total pronostics analysés (≥ 80%) : <strong>${allPredictions.length}</strong></p>
+                        <p style="color: var(--text-muted);">Moteur algorithmique multi-régions opérationnel.</p>
+                    </div>
+                `;
+                return;
             }
 
             renderPredictions(filtered);
@@ -441,11 +442,12 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allPredictions.filter(p => {
                 const comp = (p.matches?.competitions?.name || '').toLowerCase();
+                const country = (p.matches?.competitions?.country || '').toLowerCase();
                 const market = (p.market_type || '').toLowerCase();
                 const selection = (p.selection || '').toLowerCase();
                 const home = (p.matches?.home_team || '').toLowerCase();
                 const away = (p.matches?.away_team || '').toLowerCase();
-                return comp.includes(query) || market.includes(query) || selection.includes(query) || home.includes(query) || away.includes(query);
+                return comp.includes(query) || country.includes(query) || market.includes(query) || selection.includes(query) || home.includes(query) || away.includes(query);
             });
             renderPredictions(filtered);
         }
