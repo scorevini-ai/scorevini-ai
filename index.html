@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScoreVini AI - Halloween Edition</title>
+    <style>
+        :root {
+            --bg-color: #09090b;
+            --card-bg: #121215;
+            --accent-color: #22c55e;
+            --red-hot: #dc2626;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #27272a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+        header { background: var(--card-bg); border-bottom: 2px solid var(--red-hot); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo span { color: var(--red-hot); }
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .page-section { display: none; }
+        .page-section.active-page { display: block; }
+        .match-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; margin-bottom: 15px; }
+        .pred-percent { font-size: 1.1rem; font-weight: bold; color: var(--accent-color); }
+        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .nav-item { text-align: center; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--accent-color); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ScoreVini <span>AI 🎃</span></div>
+        <div style="font-size: 0.8rem; color: var(--red-hot); font-weight: bold;">🦇 100% Automatisé</div>
+    </header>
+
+    <div class="container">
+        <!-- ACCUEIL -->
+        <div id="page-accueil" class="page-section active-page">
+            <h2>👑 Top Pronos (>= 80%)</h2>
+            <div id="matches-container" style="margin-top: 15px;">
+                <p style="color: var::var(--text-muted);">Chargement des pronostics...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Remplacez par votre URL Supabase et votre Clé Publishable
+        const SUPABASE_URL = '[https://tqtkzkqampddxacxmstk.supabase.co](https://tqtkzkqampddxacxmstk.supabase.co)';
+        const SUPABASE_ANON_KEY = sb_publishable_KyUSPjb3kZ-exriMinWgOg_8JcKlVNa;
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function loadMatches() {
+            const { data, error } = await supabaseClient
+                .from('matches')
+                .select('*')
+                .gte('probability', 80)
+                .order('probability', { ascending: false });
+
+            const container = document.getElementById('matches-container');
+            if (error) {
+                container.innerHTML = `<p style="color: var(--red-hot);">Erreur de chargement des données.</p>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted);">Aucun pronostic disponible pour le moment. Le script automatique va bientôt alimenter la base !</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            data.forEach(match => {
+                container.innerHTML += `
+                    <div class="match-card">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">${match.competition}</div>
+                        <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px;">
+                            <span>${match.home_team}</span> vs <span>${match.away_team}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                            <span style="color: var(--accent-color); font-size: 0.85rem;">${match.prediction}</span>
+                            <span class="pred-percent">${match.probability}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        loadMatches();
+    </script>
+</body>
+</html>
