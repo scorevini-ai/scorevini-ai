@@ -372,7 +372,6 @@
 
         async function loadDataDirect() {
             try {
-                // Utilisation de l'API REST fetch directe de Supabase pour éviter tout blocage de SDK
                 const response = await fetch(`${supabaseUrl}/rest/v1/matches?select=*`, {
                     headers: {
                         'apikey': supabaseKey,
@@ -446,7 +445,7 @@
                                 <div class="confidence-area">
                                     <div class="market-label">Indice de Confiance IA</div>
                                     <div class="probability">${prono.confidence}%</div>
-                                </div>
+                                }
                             </div>
                         </div>
                         <div class="card-footer">PRONOSTIC VALIDE 🩸</div>
@@ -486,7 +485,7 @@
             renderMatches(filtered);
         }
 
-        // Exécution directe
+        // Lancement direct
         loadDataDirect();
     </script>
 </body>
