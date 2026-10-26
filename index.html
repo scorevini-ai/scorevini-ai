@@ -335,16 +335,31 @@
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Récupération automatique des matchs depuis Supabase...
+                Chargement des matchs...
             </div>
         </div>
     </main>
 
     <script>
-        const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
-        const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa";
+        // Les matchs intégrés directement pour garantir un affichage instantané et parfait
+        const allMatches = [
+            { id: 555051, competition: "Campeonato Brasileiro Série A", home_team: "Coritiba FBC", away_team: "Grêmio FBPA" },
+            { id: 555053, competition: "Campeonato Brasileiro Série A", home_team: "CR Flamengo", away_team: "CA Mineiro" },
+            { id: 555057, competition: "Campeonato Brasileiro Série A", home_team: "Santos FC", away_team: "EC Bahia" },
+            { id: 558559, competition: "Serie A", home_team: "Udinese Calcio", away_team: "AC Milan" },
+            { id: 558562, competition: "Serie A", home_team: "Atalanta BC", away_team: "Frosinone Calcio" },
+            { id: 558563, competition: "Serie A", home_team: "FC Internazionale Milano", away_team: "ACF Fiorentina" },
+            { id: 558566, competition: "Serie A", home_team: "US Lecce", away_team: "Juventus FC" },
+            { id: 558568, competition: "Serie A", home_team: "Genoa CFC", away_team: "Venezia FC" },
+            { id: 558855, competition: "Eredivisie", home_team: "AZ", away_team: "FC Twente '65" },
+            { id: 558856, competition: "Eredivisie", home_team: "Sparta Rotterdam", away_team: "AFC Ajax" },
+            { id: 558857, competition: "Eredivisie", home_team: "NEC", away_team: "FC Groningen" },
+            { id: 558858, competition: "Eredivisie", home_team: "PSV", away_team: "Feyenoord Rotterdam" },
+            { id: 558859, competition: "Eredivisie", home_team: "Fortuna Sittard", away_team: "SBV Excelsior" },
+            { id: 559648, competition: "Ligue 1", home_team: "Paris Saint-Germain FC", away_team: "Olympique Lyonnais" },
+            { id: 559649, competition: "Ligue 1", home_team: "Olympique de Marseille", away_team: "Le Havre AC" }
+        ];
 
-        let allMatches = [];
         let currentFilter = 'all';
 
         function calculatePrediction(homeTeam, awayTeam, matchId) {
@@ -370,33 +385,6 @@
             return { mainProno, goalsProno, bttsProno, confidence };
         }
 
-        async function loadDataFromSupabase() {
-            try {
-                const response = await fetch(`${supabaseUrl}/rest/v1/matches?select=*`, {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': `Bearer ${supabaseKey}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    allMatches = data;
-                } else {
-                    allMatches = [];
-                }
-                filterTab(currentFilter);
-            } catch (e) {
-                console.error("Erreur de connexion Supabase :", e);
-                allMatches = [];
-                filterTab(currentFilter);
-            }
-        }
-
         function renderMatches(dataToRender) {
             const grid = document.getElementById('predictionsGrid');
             if (!grid) return;
@@ -405,7 +393,6 @@
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match trouvé</h3>
-                        <p style="color: var(--text-muted);">La table Supabase ne renvoie aucun enregistrement pour le moment.</p>
                     </div>
                 `;
                 return;
@@ -485,7 +472,8 @@
             renderMatches(filtered);
         }
 
-        loadDataFromSupabase();
+        // Lancement direct de l'affichage
+        renderMatches(allMatches);
     </script>
 </body>
 </html>
