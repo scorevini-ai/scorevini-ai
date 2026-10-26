@@ -3,309 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCOREVINI AI — Horror Red & Black Edition</title>
+    <title>SCOREVINI AI — Système Automatisé</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #030303;
-            --card-bg: #0c0707;
-            --accent-blood: #8B0000;
-            --accent-red: #FF0033;
-            --border-color: #2b0a0a;
-            --text-main: #FFFFFF;
-            --text-muted: #8C8C8C;
+            --bg: #0b0f1a; --card: #0f1424; --border: #1c2a33; --green: #4ade80; --green2: #66c26e;
+            --text: #fff; --muted: #7c8597; --gold: #f0b13c; --accent-red: #FF0033;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 32px 24px; min-height: 100vh; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 10% 20%, rgba(139, 0, 0, 0.15) 0%, transparent 40%),
-                              radial-gradient(circle at 90% 80%, rgba(255, 0, 51, 0.05) 0%, transparent 40%);
-        }
-
-        aside {
-            width: 280px;
-            background: linear-gradient(180deg, #080101 0%, var(--bg-color) 100%);
-            border-right: 2px solid var(--border-color);
-            padding: 2.5rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 5px 0 30px rgba(139, 0, 0, 0.2);
-        }
-
-        .logo-text {
-            font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: var(--text-main);
-            text-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
-            margin-bottom: 3rem;
-        }
-        .logo-text span { color: var(--accent-red); text-shadow: 0 0 15px var(--accent-red); }
-
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
-        .nav-links button {
-            width: 100%; background: transparent; border: none; display: flex; align-items: center; gap: 1rem;
-            padding: 0.85rem 1rem; color: var(--text-muted); border-radius: 6px; transition: all 0.3s ease;
-            font-weight: 700; font-size: 1.1rem; cursor: pointer; text-align: left;
-        }
-        .nav-links button:hover, .nav-links button.active {
-            background: linear-gradient(90deg, rgba(139, 0, 0, 0.4) 0%, rgba(255, 0, 51, 0.1) 100%);
-            color: var(--text-main);
-            border-left: 4px solid var(--accent-red);
-            box-shadow: inset 0 0 15px rgba(255, 0, 51, 0.2);
-        }
-
-        main { flex: 1; padding: 2.5rem; overflow-y: auto; }
-
-        /* Onglets de dates dynamiques */
-        .sx-tabs { display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; }
-        .sx-tab { background: none; border: 0; cursor: pointer; text-align: center; color: var(--text-muted); font-family: inherit; padding: 0; }
-        .sx-tab b { display: block; font-size: 18px; font-weight: 700; }
-        .sx-tab span { display: block; font-size: 13px; letter-spacing: .12em; margin-top: 4px; text-transform: uppercase; }
+        /* Onglets dates */
+        .sx-tabs { display: flex; justify-content: center; gap: 56px; margin-bottom: 40px; }
+        .sx-tab { background: none; border: 0; cursor: pointer; text-align: center; color: var(--muted); padding: 0; }
+        .sx-tab b { display: block; font-size: 20px; font-weight: 600; }
+        .sx-tab span { display: block; font-size: 14px; letter-spacing: .12em; margin-top: 6px; text-transform: uppercase; }
         .sx-tab.active { color: var(--text); }
-        .sx-tab.active b { color: var(--accent-red); text-shadow: 0 0 10px rgba(255, 0, 51, 0.5); }
+        .sx-tab.active span { color: var(--green); }
 
-        /* Barre de recherche et filtres */
-        .sx-filters { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 30px; }
-        .sx-input {
-            width: 100%; background: #030303; border: 1px solid var(--border-color); border-radius: 8px;
-            color: var(--text-main); padding: 14px 18px; font-size: 1rem; font-family: inherit; outline: none;
+        /* Grille des cartes (Style Concurrence) */
+        .hp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; max-width: 1200px; margin: 0 auto; }
+        .hp-card {
+            background: var(--card); border: 1px solid #1f4a38; border-left: 4px solid var(--green2);
+            border-radius: 22px; padding: 28px; box-shadow: 0 0 28px rgba(74,222,128,.18);
         }
-        .sx-input:focus { border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 0, 51, 0.3); }
-
-        /* Grille des cartes de matchs */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
-        .card {
-            background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-red);
-            border-radius: 12px; padding: 1.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-            display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s;
-        }
-        .card:hover { transform: translateY(-3px); border-color: var(--accent-red); box-shadow: 0 8px 25px rgba(255, 0, 51, 0.2); }
-
-        .card-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; border-bottom: 1px solid #1a0808; padding-bottom: 0.5rem; }
-        .teams { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.2rem; text-align: center; color: var(--text-main); }
+        .hp-badges { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+        .hp-badge { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 9px 18px; font-size: 16px; font-weight: 600; }
+        .hp-badge.top { background: var(--gold); color: #1a1a1a; }
+        .hp-badge.safe { border: 1px solid #1f5a3a; color: var(--green); background: transparent; }
         
-        .prediction-box { background: #050202; border: 1px solid #200808; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
-        .market-item { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px dashed rgba(139, 0, 0, 0.3); font-size: 0.9rem; }
-        .market-val { font-weight: 700; color: var(--accent-red); }
+        .hp-meta { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 16px; margin-bottom: 18px; }
+        .hp-teams { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid #151c2c; margin-bottom: 20px; }
+        .hp-team { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 600; }
+        .hp-team.win { color: var(--green); }
+        .hp-logo { width: 44px; height: 44px; border-radius: 50%; background: #1a2236; }
+        .hp-vs { color: var(--muted); font-size: 22px; font-weight: 600; }
 
-        .hp-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; text-align: center; }
-        .hp-opt { background: #120505; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 4px; }
-        .hp-opt small { display: block; color: var(--text-muted); font-size: 0.8rem; }
-        .hp-opt b { font-size: 1.1rem; color: #fff; }
-        .hp-opt.active { background: rgba(139, 0, 0, 0.4); border-color: var(--accent-red); }
-        .hp-opt.active b { color: var(--accent-red); }
+        .hp-pick { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+        .hp-pick-name { font-size: 20px; font-weight: 500; }
+        .hp-pick-pct { font-size: 32px; font-weight: 700; color: var(--green); }
+        .hp-bar { height: 12px; border-radius: 999px; background: #151c2c; overflow: hidden; margin-bottom: 24px; }
+        .hp-bar i { display: block; height: 100%; background: var(--green2); border-radius: 999px; }
 
-        .probability { font-size: 1.8rem; font-weight: 900; color: var(--accent-red); font-family: 'Cinzel', serif; text-align: center; margin-top: 0.5rem; }
+        .hp-opts { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 28px; }
+        .hp-opt { background: #121828; border: 1px solid transparent; border-radius: 16px; padding: 18px 8px; text-align: center; }
+        .hp-opt small { display: block; color: #aab2c2; font-size: 16px; margin-bottom: 6px; }
+        .hp-opt b { font-size: 22px; font-weight: 700; color: #d6dbe6; }
+        .hp-opt.active { background: #12301f; border-color: #2a7a4a; }
+        .hp-opt.active small, .hp-opt.active b { color: var(--green); }
+
+        .hp-actions { display: flex; gap: 14px; }
+        .hp-bet { flex: 1; background: var(--green2); color: #0b1a10; border: 0; border-radius: 16px; padding: 18px; font-size: 20px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <aside>
-        <div>
-            <div class="logo-text">SCOREVINI <span>AI</span></div>
-            <ul class="nav-links">
-                <li><button onclick="switchMainTab('all')" id="btn-all" class="active">🩸 Accueil</button></li>
-                <li><button onclick="switchMainTab('today')" id="btn-today">⚡ Aujourd'hui</button></li>
-                <li><button onclick="switchMainTab('tomorrow')" id="btn-tomorrow">📅 Demain</button></li>
-                <li><button onclick="switchMainTab('history')" id="btn-history">📜 Historique</button></li>
-                <li><button onclick="switchMainTab('stats')" id="btn-stats">📊 Statistiques</button></li>
-            </ul>
-        </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-            <p style="font-family: 'Cinzel', serif; color: var(--accent-red);">SANG & VICTOIRE</p>
-        </div>
-    </aside>
+    <!-- Onglets dynamiques de dates (comme sur le site de la concurrence) -->
+    <div class="sx-tabs" id="sxTabs">
+        <button class="sx-tab" data-offset="-1"><b>Hier</b><span></span></button>
+        <button class="sx-tab active" data-offset="0"><b>Aujourd'hui</b><span></span></button>
+        <button class="sx-tab" data-offset="1"><b>Demain</b><span></span></button>
+    </div>
 
-    <main>
-        <!-- Onglets de dates dynamiques inspirés de ton modèle -->
-        <div class="sx-tabs" id="sxTabs">
-            <button class="sx-tab" onclick="filterByDateOffset(-1)"><b>Hier</b><span></span></button>
-            <button class="sx-tab active" onclick="filterByDateOffset(0)"><b>Aujourd'hui</b><span></span></button>
-            <button class="sx-tab" onclick="filterByDateOffset(1)"><b>Demain</b><span></span></button>
+    <!-- Grille automatisée des matchs -->
+    <div class="hp-grid" id="hpGrid">
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 3rem;">
+            Chargement automatique des matchs...
         </div>
-
-        <div class="sx-filters">
-            <input class="sx-input" id="searchInput" type="text" placeholder="Rechercher une compétition, équipe..." oninput="handleSearch()">
-        </div>
-
-        <div class="grid" id="predictionsGrid">
-            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Chargement des matchs automatisés...
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // Génération automatique des libellés de dates pour les onglets
-        const mois = ['JANV.','FÉVR.','MARS','AVR.','MAI','JUIN','JUIL.','AOÛT','SEPT.','OCT.','NOV.','DÉC.'];
-        const tabButtons = document.querySelectorAll('#sxTabs .sx-tab');
-        const now = new Date();
+        // Initialisation automatique des dates sur les onglets
+        (function(){
+            var mois=['JANV.','FÉVR.','MARS','AVR.','MAI','JUIN','JUIL.','AOÛT','SEPT.','OCT.','NOV.','DÉC.'];
+            var tabs=document.querySelectorAll('#sxTabs .sx-tab');
+            tabs.forEach(function(t){
+                var d=new Date();
+                d.setDate(d.getDate()+parseInt(t.dataset.offset,10));
+                t.querySelector('span').textContent=d.getDate()+' '+mois[d.getMonth()];
+                t.addEventListener('click',function(){
+                    tabs.forEach(function(x){x.classList.remove('active')});
+                    t.classList.add('active');
+                    loadAutomaticMatches(t.dataset.offset);
+                });
+            });
+        })();
 
-        [-1, 0, 1].forEach((offset, idx) => {
-            const d = new Date();
-            d.setDate(now.getDate() + offset);
-            tabButtons[idx].querySelector('span').textContent = d.getDate() + ' ' + mois[d.getMonth()];
-        });
-
-        const formatDateStr = (d) => d.toISOString().split('T')[0];
-        const todayStr = formatDateStr(now);
-        
-        const yestObj = new Date(); yestObj.setDate(now.getDate() - 1);
-        const yesterdayStr = formatDateStr(yestObj);
-        
-        const tomObj = new Date(); tomObj.setDate(now.getDate() + 1);
-        const tomorrowStr = formatDateStr(tomObj);
-
-        // Connexion Supabase pour récupérer les matchs automatisés en temps réel
+        // Connexion Supabase pour alimenter automatiquement les blocs comme la concurrence
         const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
         const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa";
 
-        let allMatches = [];
-        let activeDateFilter = '0'; // 0 = aujourd'hui par défaut
-
-        async function fetchMatches() {
+        async function loadAutomaticMatches(offset) {
+            const grid = document.getElementById('hpGrid');
             try {
                 const response = await fetch(`${supabaseUrl}/rest/v1/matches?select=*`, {
                     headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
                 });
+                
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.length > 0) {
-                        allMatches = data.map((m, idx) => {
-                            // Assure une répartition dynamique si la base ne contient pas encore la date exacte
-                            let dStr = m.match_date || todayStr;
-                            if (idx % 3 === 0) dStr = yesterdayStr;
-                            if (idx % 3 === 1) dStr = todayStr;
-                            if (idx % 3 === 2) dStr = tomorrowStr;
-                            return { ...m, match_date: dStr };
-                        });
+                        // Génération automatique des cartes au format exact de la concurrence
+                        grid.innerHTML = data.map((m, idx) => {
+                            const home = m.home_team || 'Équipe Domicile';
+                            const away = m.away_team || 'Équipe Extérieur';
+                            const league = m.competition || 'Championnat';
+                            const pct = 75 + (idx % 15);
+
+                            return `
+                                <div class="hp-card">
+                                    <div class="hp-badges">
+                                        <span class="hp-badge top">🔥 TOP PICK</span>
+                                        <span class="hp-badge safe">🛡️ Prono Sûr</span>
+                                    </div>
+                                    <div class="hp-meta">
+                                        <span>${league}</span>
+                                        <span style="color:#fff; font-weight:600;">En direct</span>
+                                    </div>
+                                    <div class="hp-teams">
+                                        <div class="hp-team win"><div class="hp-logo"></div><span>${home}</span></div>
+                                        <span class="hp-vs">VS</span>
+                                        <div class="hp-team"><span>${away}</span><div class="hp-logo"></div></div>
+                                    </div>
+                                    <div class="hp-pick">
+                                        <span class="hp-pick-name">${home} ou Match nul</span>
+                                        <span class="hp-pick-pct">${pct}%</span>
+                                    </div>
+                                    <div class="hp-bar"><i style="width:${pct}%"></i></div>
+                                    <div class="hp-opts">
+                                        <div class="hp-opt active"><small>1X</small><b>${pct}%</b></div>
+                                        <div class="hp-opt"><small>12</small><b>82%</b></div>
+                                        <div class="hp-opt"><small>X2</small><b>45%</b></div>
+                                    </div>
+                                    <div class="hp-actions">
+                                        <a href="#" class="hp-bet">Parier maintenant</a>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        return;
                     }
                 }
             } catch (e) {
-                console.error("Erreur de liaison Supabase", e);
+                console.error("Erreur de chargement", e);
             }
-            applyFilters();
+            grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 3rem;">Aucun match disponible pour le moment.</div>`;
         }
 
-        function renderGrid(data) {
-            const grid = document.getElementById('predictionsGrid');
-            if (!grid) return;
-
-            if.length === 0 || data.length === 0 {
-                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">Aucun match trouvé pour cette sélection.</div>`;
-                return;
-            }
-
-            grid.innerHTML = data.map(m => {
-                const home = m.home_team || 'Domicile';
-                const away = m.away_team || 'Extérieur';
-                const comp = m.competition || 'Ligue';
-                const dateM = m.match_date;
-
-                // Calcul algorithmique des cotes et pourcentages (similaire au modèle de référence)
-                const seed = (home + away + (m.id || 1)).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                const pct = 70 + (seed % 20);
-                const p1X = 60 + (seed % 30);
-                const p12 = 70 + (seed % 25);
-                const pX2 = 50 + (seed % 40);
-
-                return `
-                    <div class="card">
-                        <div>
-                            <div class="card-header">
-                                <span>${comp}</span>
-                                <span style="color:var(--accent-red); font-weight:700;">${dateM}</span>
-                            </div>
-                            <div class="teams">${home} <span style="color:var(--accent-red)">VS</span> ${away}</div>
-                            
-                            <div class="prediction-box">
-                                <div class="market-item">
-                                    <span>🎯 Prono Recommandé</span>
-                                    <span class="market-val">${home} ou Nul</span>
-                                </div>
-                                <div class="hp-opts" style="margin-top:10px;">
-                                    <div class="hp-opt active"><small>1X</small><b>${p1X}%</b></div>
-                                    <div class="hp-opt"><small>12</small><b>${p12}%</b></div>
-                                    <div class="hp-opt"><small>X2</small><b>${pX2}%</b></div>
-                                </div>
-                                <div class="probability">${pct}%</div>
-                            </div>
-                        </div>
-                        <div style="text-align:center; font-size:0.85rem; color:#ff4d4d; font-weight:700;">PRONOSTIC AUTOMATISÉ 🩸</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterByDateOffset(offset) {
-            activeDateFilter = offset;
-            tabButtons.forEach((btn, idx) => {
-                if (idx === offset + 1) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            applyFilters();
-        }
-
-        function switchMainTab(tab) {
-            document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + tab).classList.add('active');
-
-            if (tab === 'stats') {
-                document.getElementById('predictionsGrid').innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
-                        <h3 style="color: var(--accent-red); font-family: 'Cinzel', serif; font-size: 1.8rem; margin-bottom:1rem;">STATISTIQUES GLOBALES</h3>
-                        <p style="font-size: 1.2rem;">Total matchs automatisés en base : <strong>${allMatches.length}</strong></p>
-                    </div>
-                `;
-                return;
-            }
-
-            if (tab === 'history') {
-                renderGrid(allMatches.filter(m => m.match_date < todayStr));
-                return;
-            }
-            if (tab === 'today') {
-                renderGrid(allMatches.filter(m => m.match_date === todayStr));
-                return;
-            }
-            if (tab === 'tomorrow') {
-                renderGrid(allMatches.filter(m => m.match_date === tomorrowStr));
-                return;
-            }
-
-            renderGrid(allMatches);
-        }
-
-        function applyFilters() {
-            let targetDate = todayStr;
-            if (activeDateFilter === -1) targetDate = yesterdayStr;
-            if (activeDateFilter === 1) targetDate = tomorrowStr;
-
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMatches.filter(m => {
-                const matchDateMatch = (activeDateFilter === 'all') || (m.match_date === targetDate);
-                const searchMatch = (m.home_team?.toLowerCase().includes(query) || m.away_team?.toLowerCase().includes(query) || m.competition?.toLowerCase().includes(query));
-                return matchDateMatch && searchMatch;
-            });
-
-            renderGrid(filtered);
-        }
-
-        function handleSearch() {
-            applyFilters();
-        }
-
-        // Lancement initial
-        fetchMatches();
+        // Chargement initial au démarrage
+        loadAutomaticMatches('0');
     </script>
 </body>
 </html>
