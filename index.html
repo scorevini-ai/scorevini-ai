@@ -335,7 +335,7 @@
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Connexion directe à la base...
+                Récupération des 37 matchs depuis Supabase...
             </div>
         </div>
     </main>
@@ -407,13 +407,8 @@
             }
 
             grid.innerHTML = dataToRender.map(m => {
-                const rawDate = m.match_date || m.date || m.utcDate || Date.now();
-                const matchDate = new Date(rawDate);
-                const dateOptions = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
-                const dateStr = !isNaN(matchDate) ? matchDate.toLocaleDateString('fr-FR', dateOptions) : 'En direct';
-
-                const home = m.home_team || m.homeTeam || 'Domicile';
-                const away = m.away_team || m.awayTeam || 'Extérieur';
+                const home = m.home_team || 'Domicile';
+                const away = m.away_team || 'Extérieur';
                 const comp = m.competition || 'Championnat';
                 const id = m.id || 1;
 
@@ -424,7 +419,7 @@
                         <div>
                             <div class="card-header">
                                 <span>${comp}</span>
-                                <span>${dateStr}</span>
+                                <span>En direct</span>
                             </div>
                             <div class="teams">${home} <span style="color:var(--accent-red)">VS</span> ${away}</div>
                             
@@ -445,7 +440,7 @@
                                 <div class="confidence-area">
                                     <div class="market-label">Indice de Confiance IA</div>
                                     <div class="probability">${prono.confidence}%</div>
-                                }
+                                </div>
                             </div>
                         </div>
                         <div class="card-footer">PRONOSTIC VALIDE 🩸</div>
@@ -478,14 +473,13 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allMatches.filter(m => {
                 const comp = (m.competition || '').toLowerCase();
-                const home = (m.home_team || m.homeTeam || '').toLowerCase();
-                const away = (m.away_team || m.awayTeam || '').toLowerCase();
+                const home = (m.home_team || '').toLowerCase();
+                const away = (m.away_team || '').toLowerCase();
                 return comp.includes(query) || home.includes(query) || away.includes(query);
             });
             renderMatches(filtered);
         }
 
-        // Lancement direct
         loadDataDirect();
     </script>
 </body>
