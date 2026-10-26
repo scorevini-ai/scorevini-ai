@@ -335,16 +335,14 @@
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Connexion à la base de données...
+                Connexion directe à la base...
             </div>
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
-        const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa"; 
-        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa";
 
         let allMatches = [];
         let currentFilter = 'all';
@@ -372,18 +370,24 @@
             return { mainProno, goalsProno, bttsProno, confidence };
         }
 
-        async function loadDataFromSupabase() {
+        async function loadDataDirect() {
             try {
-                const { data, error } = await _supabase.from('matches').select('*');
-                if (error) {
-                    console.error("Erreur Supabase :", error);
-                    allMatches = [];
-                } else {
-                    allMatches = data || [];
+                // Utilisation de l'API REST fetch directe de Supabase pour éviter tout blocage de SDK
+                const response = await fetch(`${supabaseUrl}/rest/v1/matches?select=*`, {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
                 }
+
+                allMatches = await response.json();
                 filterTab(currentFilter);
             } catch (e) {
-                console.error("Erreur critique :", e);
+                console.error("Erreur de récupération :", e);
                 allMatches = [];
                 filterTab(currentFilter);
             }
@@ -396,8 +400,8 @@
             if (dataToRender.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
-                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match disponible</h3>
-                        <p style="color: var(--text-muted);">La base de données est vide pour le moment.</p>
+                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match trouvé</h3>
+                        <p style="color: var(--text-muted);">Vérifiez si la table contient bien des données.</p>
                     </div>
                 `;
                 return;
@@ -482,8 +486,8 @@
             renderMatches(filtered);
         }
 
-        // Lancement de la récupération automatique
-        loadDataFromSupabase();
+        // Exécution directe
+        loadDataDirect();
     </script>
 </body>
 </html>
