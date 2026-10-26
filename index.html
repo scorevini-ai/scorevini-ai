@@ -30,7 +30,7 @@
             display: flex;
             overflow-x: hidden;
             background-image: radial-gradient(circle at 10% 20%, rgba(139, 0, 0, 0.15) 0%, transparent 40%),
-                              radial-gradient(circle at 90% 80%, rgba(255, 0, 51, 0.05) 0%, transparent 40%);
+                            radial-gradient(circle at 90% 80%, rgba(255, 0, 51, 0.05) 0%, transparent 40%);
         }
 
         aside {
@@ -300,17 +300,17 @@
 
     <main>
         <header>
-            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher équipe, pays, région..." oninput="handleSearch()">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher équipe, compétition..." oninput="handleSearch()">
             <div style="font-weight: 700; font-size: 0.95rem; color: #ff3333; text-shadow: 0 0 10px rgba(255,0,51,0.5);">💀 SYSTÈME ACTIF</div>
         </header>
 
         <div class="hero">
-            <span class="badge-live">TRAITEMENT SANGUIN ≥ 78%</span>
+            <span class="badge-live">SYNCHRONISATION EN DIRECT</span>
             <h1>LE TERRAIN N'APPARTIENT QU'À CEUX <span>QUI DOMINENT</span></h1>
-            <p>Analyse automatisée multi-régions (Europe, Amérique, Afrique) connectée en temps réel.</p>
+            <p>Analyse automatisée des matchs en temps réel depuis Supabase.</p>
         </div>
 
-        <div class="section-title" id="sectionTitle">Sélections Sanglantes (Fiabilité ≥ 78%)</div>
+        <div class="section-title" id="sectionTitle">Matchs du Jour (Football-Data)</div>
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
@@ -325,28 +325,28 @@
         const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa"; 
         const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        let allPredictions = [];
+        let allMatches = [];
         let currentFilter = 'all';
 
         async function loadData() {
             try {
                 const { data, error } = await _supabase
-                    .from('predictions')
-                    .select('*, matches(*, competitions(name, country))')
-                    .gte('probability', 78);
+                    .from('matches')
+                    .select('*')
+                    .order('match_date', { ascending: true });
 
-               if (error || !data || data.length === 0) {
-    allPredictions = [];
-} else {
-    allPredictions = data;
-}
+                if (error || !data) {
+                    allMatches = [];
+                } else {
+                    allMatches = data;
+                }
                 filterTab(currentFilter);
             } catch (e) {
                 console.error("Erreur de chargement", e);
             }
         }
 
-        function renderPredictions(dataToRender) {
+        function renderMatches(dataToRender) {
             const grid = document.getElementById('predictionsGrid');
             if (!grid) return;
 
@@ -354,35 +354,30 @@
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucune victime trouvée</h3>
-                        <p style="color: var(--text-muted);">Aucun match ne correspond à cette période ou région.</p>
+                        <p style="color: var(--text-muted);">Aucun match ne correspond à cette période.</p>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = dataToRender.map(p => {
-                const matchDate = new Date(p.matches?.match_date || Date.now());
+            grid.innerHTML = dataToRender.map(m => {
+                const matchDate = new Date(m.match_date || Date.now());
                 const dateOptions = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
                 const dateStr = matchDate.toLocaleDateString('fr-FR', dateOptions);
-                const compName = p.matches?.competitions?.name || 'Compétition';
-                const countryName = p.matches?.competitions?.country ? ` (${p.matches.competitions.country})` : '';
-                const teamDisplay = p.matches?.home_team && p.matches?.away_team 
-                    ? `${p.matches.home_team} vs ${p.matches.away_team}` 
-                    : p.market_type;
 
                 return `
                     <div class="card">
                         <div class="card-header">
-                            <span>${compName}${countryName}</span>
+                            <span>${m.competition || 'Compétition'}</span>
                             <span>${dateStr}</span>
                         </div>
-                        <div class="teams">${teamDisplay}</div>
+                        <div class="teams">${m.home_team} vs ${m.away_team}</div>
                         <div class="prediction-box">
-                            <div class="market-name">${p.market_type}</div>
-                            <div class="market-selection">${p.selection}</div>
-                            <div class="probability">${p.probability}%</div>
+                            <div class="market-name">Statut / Prédiction</div>
+                            <div class="market-selection">${m.prediction || 'En attente'}</div>
+                            <div class="probability">${m.status || 'SCHEDULED'}</div>
                         </div>
-                        <div class="card-footer">Pronostic Actif 🩸</div>
+                        <div class="card-footer">Match Actif 🩸</div>
                     </div>
                 `;
             }).join('');
@@ -401,50 +396,47 @@
             tomorrow.setDate(now.getDate() + 1);
             const tomorrowStr = tomorrow.toDateString();
 
-            let filtered = allPredictions;
+            let filtered = allMatches;
 
             if (tab === 'today') {
-                filtered = allPredictions.filter(p => {
-                    if (!p.matches?.match_date) return false;
-                    return new Date(p.matches.match_date).toDateString() === todayStr;
+                filtered = allMatches.filter(m => {
+                    if (!m.match_date) return false;
+                    return new Date(m.match_date).toDateString() === todayStr;
                 });
             } else if (tab === 'tomorrow') {
-                filtered = allPredictions.filter(p => {
-                    if (!p.matches?.match_date) return false;
-                    return new Date(p.matches.match_date).toDateString() === tomorrowStr;
+                filtered = allMatches.filter(m => {
+                    if (!m.match_date) return false;
+                    return new Date(m.match_date).toDateString() === tomorrowStr;
                 });
             } else if (tab === 'history') {
-                filtered = allPredictions.filter(p => {
-                    if (!p.matches?.match_date) return false;
-                    const d = new Date(p.matches.match_date);
+                filtered = allMatches.filter(m => {
+                    if (!m.match_date) return false;
+                    const d = new Date(m.match_date);
                     return d < now && d.toDateString() !== todayStr;
                 });
             } else if (tab === 'stats') {
                 document.getElementById('predictionsGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--accent-red); margin-bottom: 1rem; font-family: 'Cinzel', serif; font-size: 1.8rem;">STATISTIQUES GLOBALES</h3>
-                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total pronostics analysés (≥ 80%) : <strong>${allPredictions.length}</strong></p>
-                        <p style="color: var(--text-muted);">Moteur algorithmique multi-régions opérationnel.</p>
+                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total matchs synchronisés : <strong>${allMatches.length}</strong></p>
+                        <p style="color: var(--text-muted);">Moteur de synchronisation opérationnel.</p>
                     </div>
                 `;
                 return;
             }
 
-            renderPredictions(filtered);
+            renderMatches(filtered);
         }
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allPredictions.filter(p => {
-                const comp = (p.matches?.competitions?.name || '').toLowerCase();
-                const country = (p.matches?.competitions?.country || '').toLowerCase();
-                const market = (p.market_type || '').toLowerCase();
-                const selection = (p.selection || '').toLowerCase();
-                const home = (p.matches?.home_team || '').toLowerCase();
-                const away = (p.matches?.away_team || '').toLowerCase();
-                return comp.includes(query) || country.includes(query) || market.includes(query) || selection.includes(query) || home.includes(query) || away.includes(query);
+            const filtered = allMatches.filter(m => {
+                const comp = (m.competition || '').toLowerCase();
+                const home = (m.home_team || '').toLowerCase();
+                const away = (m.away_team || '').toLowerCase();
+                return comp.includes(query) || home.includes(query) || away.includes(query);
             });
-            renderPredictions(filtered);
+            renderMatches(filtered);
         }
 
         loadData();
