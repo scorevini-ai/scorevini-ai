@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCOREVINI AI — Horror Red & Black Edition</title>
+    <title>SCOREVINI AI — Live Automatic Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -146,12 +146,13 @@
             <input class="sx-input" id="searchInput" type="text" placeholder="Rechercher une équipe, compétition..." oninput="handleSearch()">
         </div>
 
-        <div class="hp-grid" id="hpGrid"></div>
+        <div class="hp-grid" id="hpGrid">
+            <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">Connexion à l'API de football en cours...</div>
+        </div>
     </main>
 
     <script>
         const mois = ['JANV.','FÉVR.','MARS','AVR.','MAI','JUIN','JUIL.','AOÛT','SEPT.','OCT.','NOV.','DÉC.'];
-        
         const now = new Date();
         const formatDate = (d) => {
             const year = d.getFullYear();
@@ -161,10 +162,8 @@
         };
 
         const todayStr = formatDate(now);
-
         const yest = new Date(); yest.setDate(now.getDate() - 1);
         const yestStr = formatDate(yest);
-
         const tom = new Date(); tom.setDate(now.getDate() + 1);
         const tomStr = formatDate(tom);
 
@@ -172,29 +171,52 @@
         document.getElementById('date-today').textContent = now.getDate() + ' ' + mois[now.getMonth()];
         document.getElementById('date-tom').textContent = tom.getDate() + ' ' + mois[tom.getMonth()];
 
-        const matchesDatabase = [
-            { id: 101, date: yestStr, league: 'Serie A', time: 'Terminé', home: 'Udinese Calcio', away: 'AC Milan', winTeam: 'away', pick: 'AC Milan ou Nul', pct: 82, opts: {'1X':45, '12':78, 'X2':82}, activeOpt: 'X2' },
-            { id: 102, date: yestStr, league: 'Campeonato Brasileiro', time: 'Terminé (2-1)', home: 'Santos FC', away: 'EC Bahia', winTeam: 'home', pick: 'Santos FC ou Nul', pct: 75, opts: {'1X':75, '12':70, 'X2':50}, activeOpt: '1X' },
-            { id: 103, date: yestStr, league: 'Serie A', time: 'Terminé (1-0)', home: 'Genoa CFC', away: 'Venezia FC', winTeam: 'home', pick: 'Genoa CFC ou Nul', pct: 79, opts: {'1X':79, '12':72, 'X2':48}, activeOpt: '1X' },
-            { id: 104, date: yestStr, league: 'Serie A', time: 'Terminé (0-1)', home: 'Inter Milan', away: 'Fiorentina', winTeam: 'away', pick: 'Fiorentina ou Nul', pct: 84, opts: {'1X':40, '12':75, 'X2':84}, activeOpt: 'X2' },
+        const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
+        const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa";
 
-            { id: 1, date: todayStr, league: 'Campeonato Brasileiro', time: 'En direct', home: 'Coritiba FBC', away: 'Grêmio FBPA', winTeam: 'home', pick: 'Coritiba FBC ou Nul', pct: 85, opts: {'1X':85, '12':78, 'X2':52}, activeOpt: '1X' },
-            { id: 2, date: todayStr, league: 'Serie A', time: '18:30', home: 'Atalanta BC', away: 'Frosinone Calcio', winTeam: 'home', pick: 'Atalanta BC ou Nul', pct: 88, opts: {'1X':88, '12':80, 'X2':40}, activeOpt: '1X' },
-            { id: 3, date: todayStr, league: 'Ligue 1', time: '20:45', home: 'Paris Saint-Germain', away: 'Olympique Lyonnais', winTeam: 'home', pick: 'Paris Saint-Germain ou Nul', pct: 91, opts: {'1X':91, '12':85, 'X2':30}, activeOpt: '1X' },
-
-            { id: 201, date: tomStr, league: 'Campeonato Brasileiro', time: '01:00', home: 'CR Flamengo', away: 'CA Mineiro', winTeam: 'home', pick: 'CR Flamengo ou Nul', pct: 86, opts: {'1X':86, '12':80, 'X2':45}, activeOpt: '1X' },
-            { id: 202, date: tomStr, league: 'Serie A', time: '18:30', home: 'US Lecce', away: 'Juventus FC', winTeam: 'away', pick: 'Juventus FC ou Nul', pct: 89, opts: {'1X':40, '12':75, 'X2':89}, activeOpt: 'X2' },
-            { id: 203, date: tomStr, league: 'Eredivisie', time: '14:30', home: 'Sparta Rotterdam', away: 'AFC Ajax', winTeam: 'away', pick: 'AFC Ajax ou Nul', pct: 80, opts: {'1X':50, '12':72, 'X2':80}, activeOpt: 'X2' }
-        ];
-
+        let liveMatches = [];
         let currentTab = 'today';
+
+        async function fetchAPI() {
+            try {
+                const response = await fetch(`${supabaseUrl}/rest/v1/matches?select=*`, {
+                    headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        liveMatches = data.map(m => ({
+                            id: m.id,
+                            date: m.match_date || todayStr,
+                            league: m.competition || 'Football',
+                            time: m.status || m.time || 'En direct',
+                            home: m.home_team || 'Domicile',
+                            away: m.away_team || 'Extérieur',
+                            winTeam: m.winner || 'home',
+                            pick: m.prediction || `${m.home_team || 'Domicile'} ou Nul`,
+                            pct: m.confidence || 85,
+                            opts: m.odds || {'1X': 85, '12': 78, 'X2': 52},
+                            activeOpt: m.best_opt || '1X'
+                        }));
+                        filterByDate(currentTab);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error("Erreur API:", e);
+            }
+
+            // Si la base est vide, affiche un message propre
+            document.getElementById('hpGrid').innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">Aucun match trouvé via l'API pour le moment.</div>`;
+        }
 
         function renderMatches(data) {
             const grid = document.getElementById('hpGrid');
             if (!grid) return;
 
             if (!data || data.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">Aucun match pour cette date. Le système s'actualise automatiquement.</div>`;
+                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">Aucun match pour cette date.</div>`;
                 return;
             }
 
@@ -211,7 +233,7 @@
                             </div>
                             <div class="hp-meta">
                                 <span>${m.league}</span>
-                                <span style="color:var(--accent-red); font-weight:700;">${m.time} (${m.date})</span>
+                                <span style="color:var(--accent-red); font-weight:700;">${m.time}</span>
                             </div>
                             <div class="hp-teams">
                                 <div class="hp-team ${homeWin}"><div class="hp-logo">🏠</div><span>${m.home}</span></div>
@@ -224,9 +246,9 @@
                             </div>
                             <div class="hp-bar"><i style="width:${m.pct}%"></i></div>
                             <div class="hp-opts">
-                                <div class="hp-opt ${m.activeOpt === '1X' ? 'active' : ''}"><small>1X</small><b>${m.opts['1X']}%</b></div>
-                                <div class="hp-opt ${m.activeOpt === '12' ? 'active' : ''}"><small>12</small><b>${m.opts['12']}%</b></div>
-                                <div class="hp-opt ${m.activeOpt === 'X2' ? 'active' : ''}"><small>X2</small><b>${m.opts['X2']}%</b></div>
+                                <div class="hp-opt ${m.activeOpt === '1X' ? 'active' : ''}"><small>1X</small><b>${m.opts['1X'] || 85}%</b></div>
+                                <div class="hp-opt ${m.activeOpt === '12' ? 'active' : ''}"><small>12</small><b>${m.opts['12'] || 78}%</b></div>
+                                <div class="hp-opt ${m.activeOpt === 'X2' ? 'active' : ''}"><small>X2</small><b>${m.opts['X2'] || 52}%</b></div>
                             </div>
                         </div>
                         <button class="hp-bet">ANALYSE COMPLÈTE 🩸</button>
@@ -237,16 +259,20 @@
 
         function filterByDate(type, btnElement) {
             currentTab = type;
-            document.querySelectorAll('.sx-tabs .sx-tab').forEach(btn => btn.classList.remove('active'));
-            if (btnElement) btnElement.classList.add('active');
+            if (btnElement) {
+                document.querySelectorAll('.sx-tabs .sx-tab').forEach(btn => btn.classList.remove('active'));
+                btnElement.classList.add('active');
+            }
 
             let filtered = [];
             if (type === 'history') {
-                filtered = matchesDatabase.filter(m => m.date < todayStr);
+                filtered = liveMatches.filter(m => m.date < todayStr);
             } else if (type === 'today') {
-                filtered = matchesDatabase.filter(m => m.date === todayStr);
+                filtered = liveMatches.filter(m => m.date === todayStr);
             } else if (type === 'tomorrow') {
-                filtered = matchesDatabase.filter(m => m.date === tomStr);
+                filtered = liveMatches.filter(m => m.date === tomStr);
+            } else {
+                filtered = liveMatches;
             }
             renderMatches(filtered);
         }
@@ -259,35 +285,26 @@
                 document.getElementById('hpGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px;">
                         <h3 style="color: var(--accent-red); font-family: 'Cinzel', serif; font-size: 1.8rem; margin-bottom:1rem;">STATISTIQUES GLOBALES</h3>
-                        <p style="font-size: 1.2rem;">Total matchs gérés par le moteur : <strong>${matchesDatabase.length}</strong></p>
-                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Date active du système : <strong>${todayStr}</strong></p>
+                        <p style="font-size: 1.2rem;">Matchs récupérés via l'API : <strong>${liveMatches.length}</strong></p>
+                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Moteur actif.</p>
                     </div>
                 `;
                 return;
             }
 
-            if (tab === 'history') {
-                renderMatches(matchesDatabase.filter(m => m.date < todayStr));
-                return;
-            }
-            if (tab === 'today') {
-                renderMatches(matchesDatabase.filter(m => m.date === todayStr));
-                return;
-            }
-            if (tab === 'tomorrow') {
-                renderMatches(matchesDatabase.filter(m => m.date === tomStr));
-                return;
-            }
+            if (tab === 'history') { filterByDate('history'); return; }
+            if (tab === 'today') { filterByDate('today'); return; }
+            if (tab === 'tomorrow') { filterByDate('tomorrow'); return; }
 
-            renderMatches(matchesDatabase);
+            renderMatches(liveMatches);
         }
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            let baseList = matchesDatabase;
-            if (currentTab === 'history') baseList = matchesDatabase.filter(m => m.date < todayStr);
-            else if (currentTab === 'today') baseList = matchesDatabase.filter(m => m.date === todayStr);
-            else if (currentTab === 'tomorrow') baseList = matchesDatabase.filter(m => m.date === tomStr);
+            let baseList = liveMatches;
+            if (currentTab === 'history') baseList = liveMatches.filter(m => m.date < todayStr);
+            else if (currentTab === 'today') baseList = liveMatches.filter(m => m.date === todayStr);
+            else if (currentTab === 'tomorrow') baseList = liveMatches.filter(m => m.date === tomStr);
 
             const filtered = baseList.filter(m => {
                 return m.home.toLowerCase().includes(query) || m.away.toLowerCase().includes(query) || m.league.toLowerCase().includes(query);
@@ -295,7 +312,7 @@
             renderMatches(filtered);
         }
 
-        renderMatches(matchesDatabase.filter(m => m.date === todayStr));
+        fetchAPI();
     </script>
 </body>
 </html>
