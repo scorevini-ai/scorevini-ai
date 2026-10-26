@@ -67,7 +67,7 @@
 
         main { flex: 1; padding: 2.5rem; overflow-y: auto; }
 
-        /* Onglets dates inspirés de la concurrence */
+        /* Onglets dates */
         .sx-tabs { display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; }
         .sx-tab { background: none; border: 0; cursor: pointer; text-align: center; color: var(--text-muted); font-family: inherit; padding: 0; }
         .sx-tab b { display: block; font-size: 18px; font-weight: 700; }
@@ -83,7 +83,7 @@
         }
         .sx-input:focus { border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 0, 51, 0.3); }
 
-        /* Grille des cartes de la concurrence */
+        /* Grille des cartes */
         .hp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
         .hp-card {
             background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-red);
@@ -96,7 +96,6 @@
         .hp-badge { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 600; }
         .hp-badge.top { background: var(--gold); color: #1a1a1a; }
         .hp-badge.safe { border: 1px solid var(--accent-blood); color: var(--accent-red); background: transparent; }
-        .hp-badge.solid { background: rgba(255, 0, 51, 0.2); color: var(--accent-red); font-size: 15px; border: 1px solid var(--accent-red); }
 
         .hp-meta { display: flex; align-items: center; justify-content: space-between; color: var(--text-muted); font-size: 15px; margin-bottom: 18px; }
         .hp-teams { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid #1a0808; margin-bottom: 20px; }
@@ -118,7 +117,7 @@
         .hp-opt.active { background: rgba(139, 0, 0, 0.4); border-color: var(--accent-red); }
         .hp-opt.active small, .hp-opt.active b { color: var(--accent-red); }
 
-        .hp-bet { width: 100%; background: var(--accent-red); color: #fff; border: 0; border-radius: 12px; padding: 16px; font-size: 18px; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: block; box-shadow: 0 5px 15px rgba(255, 0, 51, 0.4); transition: filter 0.2s; }
+        .hp-bet { width: 100%; background: var(--accent-red); color: #fff; border: 0; border-radius: 12px; padding: 16px; font-size: 18px; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: block; box-shadow: 0 5px 15px rgba(255, 0, 51, 0.4); }
         .hp-bet:hover { filter: brightness(1.2); }
     </style>
 </head>
@@ -143,9 +142,9 @@
     <main>
         <!-- Onglets de dates dynamiques -->
         <div class="sx-tabs" id="sxTabs">
-            <button class="sx-tab" onclick="filterByDate('history')"><b>Hier</b><span id="date-yest"></span></button>
-            <button class="sx-tab active" onclick="filterByDate('today')"><b>Aujourd'hui</b><span id="date-today"></span></button>
-            <button class="sx-tab" onclick="filterByDate('tomorrow')"><b>Demain</b><span id="date-tom"></span></button>
+            <button class="sx-tab" onclick="filterByDate('history', this)"><b>Hier</b><span id="date-yest"></span></button>
+            <button class="sx-tab active" onclick="filterByDate('today', this)"><b>Aujourd'hui</b><span id="date-today"></span></button>
+            <button class="sx-tab" onclick="filterByDate('tomorrow', this)"><b>Demain</b><span id="date-tom"></span></button>
         </div>
 
         <div class="sx-filters">
@@ -156,7 +155,6 @@
     </main>
 
     <script>
-        // Gestion des dates pour les onglets
         const mois = ['JANV.','FÉVR.','MARS','AVR.','MAI','JUIN','JUIL.','AOÛT','SEPT.','OCT.','NOV.','DÉC.'];
         const now = new Date();
         
@@ -167,26 +165,22 @@
         document.getElementById('date-today').textContent = now.getDate() + ' ' + mois[now.getMonth()];
         document.getElementById('date-tom').textContent = tom.getDate() + ' ' + mois[tom.getMonth()];
 
-        // Base de données des matchs structurée exactement comme la concurrence
         const matchesDatabase = [
-            // Hier (Historique)
             { id: 101, category: 'history', league: 'Serie A', time: 'Terminé', home: 'Udinese Calcio', away: 'AC Milan', winTeam: 'away', pick: 'AC Milan ou Nul', pct: 82, opts: {'1X':45, '12':78, 'X2':82}, activeOpt: 'X2' },
             { id: 102, category: 'history', league: 'Campeonato Brasileiro', time: 'Terminé (2-1)', home: 'Santos FC', away: 'EC Bahia', winTeam: 'home', pick: 'Santos FC ou Nul', pct: 75, opts: {'1X':75, '12':70, 'X2':50}, activeOpt: '1X' },
             { id: 103, category: 'history', league: 'Serie A', time: 'Terminé (1-0)', home: 'Genoa CFC', away: 'Venezia FC', winTeam: 'home', pick: 'Genoa CFC ou Nul', pct: 79, opts: {'1X':79, '12':72, 'X2':48}, activeOpt: '1X' },
 
-            // Aujourd'hui
             { id: 1, category: 'today', league: 'Campeonato Brasileiro', time: 'En direct', home: 'Coritiba FBC', away: 'Grêmio FBPA', winTeam: 'home', pick: 'Coritiba FBC ou Nul', pct: 85, opts: {'1X':85, '12':78, 'X2':52}, activeOpt: '1X' },
             { id: 2, category: 'today', league: 'Serie A', time: '18:30', home: 'Atalanta BC', away: 'Frosinone Calcio', winTeam: 'home', pick: 'Atalanta BC ou Nul', pct: 88, opts: {'1X':88, '12':80, 'X2':40}, activeOpt: '1X' },
             { id: 3, category: 'today', league: 'Ligue 1', time: '20:45', home: 'Paris Saint-Germain', away: 'Olympique Lyonnais', winTeam: 'home', pick: 'Paris Saint-Germain ou Nul', pct: 91, opts: {'1X':91, '12':85, 'X2':30}, activeOpt: '1X' },
             { id: 4, category: 'today', league: 'Serie A', time: '21:00', home: 'Inter Milan', away: 'Fiorentina', winTeam: 'home', pick: 'Inter Milan ou Match Nul', pct: 84, opts: {'1X':84, '12':75, 'X2':50}, activeOpt: '1X' },
 
-            // Demain
             { id: 201, category: 'tomorrow', league: 'Campeonato Brasileiro', time: 'Demain 01:00', home: 'CR Flamengo', away: 'CA Mineiro', winTeam: 'home', pick: 'CR Flamengo ou Nul', pct: 86, opts: {'1X':86, '12':80, 'X2':45}, activeOpt: '1X' },
             { id: 202, category: 'tomorrow', league: 'Serie A', time: 'Demain 18:30', home: 'US Lecce', away: 'Juventus FC', winTeam: 'away', pick: 'Juventus FC ou Nul', pct: 89, opts: {'1X':40, '12':75, 'X2':89}, activeOpt: 'X2' },
             { id: 203, category: 'tomorrow', league: 'Eredivisie', time: 'Demain 14:30', home: 'Sparta Rotterdam', away: 'AFC Ajax', winTeam: 'away', pick: 'AFC Ajax ou Nul', pct: 80, opts: {'1X':50, '12':72, 'X2':80}, activeOpt: 'X2' }
         ];
 
-        let currentFilter = 'today'; // Par défaut sur aujourd'hui
+        let currentFilter = 'today';
 
         function renderMatches(data) {
             const grid = document.getElementById('hpGrid');
@@ -234,14 +228,10 @@
             }).join('');
         }
 
-        function filterByDate(category) {
+        function filterByDate(category, btnElement) {
             currentFilter = category;
-            
-            // Mise à jour visuelle des boutons d'onglets
             document.querySelectorAll('.sx-tabs .sx-tab').forEach(btn => btn.classList.remove('active'));
-            if(category === 'history') event.currentTarget.classList.add('active');
-            if(category === 'today') event.currentTarget.classList.add('active');
-            if(category === 'tomorrow') event.currentTarget.classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
 
             const filtered = matchesDatabase.filter(m => m.category === category);
             renderMatches(filtered);
@@ -275,7 +265,6 @@
                 return;
             }
 
-            // Accueil (affiche tous les matchs)
             renderMatches(matchesDatabase);
         }
 
@@ -289,7 +278,7 @@
             renderMatches(filtered);
         }
 
-        // Affichage initial sur "Aujourd'hui"
+        // Chargement initial des matchs d'aujourd'hui
         renderMatches(matchesDatabase.filter(m => m.category === 'today'));
     </script>
 </body>
