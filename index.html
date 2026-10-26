@@ -335,7 +335,7 @@
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Chargement des matchs...
+                Connexion à la base de données...
             </div>
         </div>
     </main>
@@ -372,22 +372,18 @@
             return { mainProno, goalsProno, bttsProno, confidence };
         }
 
-        async function loadData() {
+        async function loadDataFromSupabase() {
             try {
-                // Requête simple sans tri strict pour éviter tout blocage de colonne
-                const { data, error } = await _supabase
-                    .from('matches')
-                    .select('*');
-
+                const { data, error } = await _supabase.from('matches').select('*');
                 if (error) {
-                    console.error("Erreur Supabase détaillée :", error);
+                    console.error("Erreur Supabase :", error);
                     allMatches = [];
                 } else {
                     allMatches = data || [];
                 }
                 filterTab(currentFilter);
             } catch (e) {
-                console.error("Erreur critique de chargement :", e);
+                console.error("Erreur critique :", e);
                 allMatches = [];
                 filterTab(currentFilter);
             }
@@ -400,15 +396,14 @@
             if (dataToRender.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
-                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match trouvé</h3>
-                        <p style="color: var(--text-muted);">Vérifiez la console (F12) pour voir si une erreur est survenue.</p>
+                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match disponible</h3>
+                        <p style="color: var(--text-muted);">La base de données est vide pour le moment.</p>
                     </div>
                 `;
                 return;
             }
 
             grid.innerHTML = dataToRender.map(m => {
-                // Gestion flexible de la date (prend match_date, date, ou la date du jour par défaut)
                 const rawDate = m.match_date || m.date || m.utcDate || Date.now();
                 const matchDate = new Date(rawDate);
                 const dateOptions = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
@@ -462,8 +457,6 @@
             const activeBtn = document.getElementById('btn-' + tab);
             if (activeBtn) activeBtn.classList.add('active');
 
-            let filtered = allMatches;
-
             if (tab === 'stats') {
                 document.getElementById('predictionsGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
@@ -475,13 +468,7 @@
                 return;
             }
 
-            // Si on clique sur Accueil ('all'), on affiche tous les matchs directement sans filtre bloquant
-            if (tab === 'today' || tab === 'tomorrow') {
-                // Fallback intelligent pour afficher les matchs même si les dates diffèrent légèrement
-                filtered = allMatches; 
-            }
-
-            renderMatches(filtered);
+            renderMatches(allMatches);
         }
 
         function handleSearch() {
@@ -495,7 +482,8 @@
             renderMatches(filtered);
         }
 
-        loadData();
+        // Lancement de la récupération automatique
+        loadDataFromSupabase();
     </script>
 </body>
 </html>
