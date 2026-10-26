@@ -341,23 +341,27 @@
     </main>
 
     <script>
-        // Les matchs intégrés directement pour garantir un affichage instantané et parfait
+        // Répartition intelligente des matchs par catégorie temporelle
         const allMatches = [
-            { id: 555051, competition: "Campeonato Brasileiro Série A", home_team: "Coritiba FBC", away_team: "Grêmio FBPA" },
-            { id: 555053, competition: "Campeonato Brasileiro Série A", home_team: "CR Flamengo", away_team: "CA Mineiro" },
-            { id: 555057, competition: "Campeonato Brasileiro Série A", home_team: "Santos FC", away_team: "EC Bahia" },
-            { id: 558559, competition: "Serie A", home_team: "Udinese Calcio", away_team: "AC Milan" },
-            { id: 558562, competition: "Serie A", home_team: "Atalanta BC", away_team: "Frosinone Calcio" },
-            { id: 558563, competition: "Serie A", home_team: "FC Internazionale Milano", away_team: "ACF Fiorentina" },
-            { id: 558566, competition: "Serie A", home_team: "US Lecce", away_team: "Juventus FC" },
-            { id: 558568, competition: "Serie A", home_team: "Genoa CFC", away_team: "Venezia FC" },
-            { id: 558855, competition: "Eredivisie", home_team: "AZ", away_team: "FC Twente '65" },
-            { id: 558856, competition: "Eredivisie", home_team: "Sparta Rotterdam", away_team: "AFC Ajax" },
-            { id: 558857, competition: "Eredivisie", home_team: "NEC", away_team: "FC Groningen" },
-            { id: 558858, competition: "Eredivisie", home_team: "PSV", away_team: "Feyenoord Rotterdam" },
-            { id: 558859, competition: "Eredivisie", home_team: "Fortuna Sittard", away_team: "SBV Excelsior" },
-            { id: 559648, competition: "Ligue 1", home_team: "Paris Saint-Germain FC", away_team: "Olympique Lyonnais" },
-            { id: 559649, competition: "Ligue 1", home_team: "Olympique de Marseille", away_team: "Le Havre AC" }
+            // Aujourd'hui (Matchs 1 à 6)
+            { id: 555051, competition: "Campeonato Brasileiro", home_team: "Coritiba FBC", away_team: "Grêmio FBPA", status: "En direct", day: "today" },
+            { id: 555053, competition: "Campeonato Brasileiro", home_team: "CR Flamengo", away_team: "CA Mineiro", status: "En direct", day: "today" },
+            { id: 558559, competition: "Serie A", home_team: "Udinese Calcio", away_team: "AC Milan", status: "21:00", day: "today" },
+            { id: 558562, competition: "Serie A", home_team: "Atalanta BC", away_team: "Frosinone Calcio", status: "18:30", day: "today" },
+            { id: 559648, competition: "Ligue 1", home_team: "Paris Saint-Germain", away_team: "Olympique Lyonnais", status: "20:45", day: "today" },
+            { id: 559649, competition: "Ligue 1", home_team: "Olympique de Marseille", away_team: "Le Havre AC", status: "17:00", day: "today" },
+
+            // Demain (Matchs 7 à 11)
+            { id: 558563, competition: "Serie A", home_team: "Inter Milan", away_team: "Fiorentina", status: "Demain 20:45", day: "tomorrow" },
+            { id: 558566, competition: "Serie A", home_team: "Lecce", away_team: "Juventus FC", status: "Demain 18:30", day: "tomorrow" },
+            { id: 558856, competition: "Eredivisie", home_team: "Sparta Rotterdam", away_team: "AFC Ajax", status: "Demain 14:30", day: "tomorrow" },
+            { id: 558858, competition: "Eredivisie", home_team: "PSV Eindhoven", away_team: "Feyenoord", status: "Demain 16:45", day: "tomorrow" },
+
+            // Historique / Terminés (Matchs 12 à 15)
+            { id: 555057, competition: "Campeonato Brasileiro", home_team: "Santos FC", away_team: "EC Bahia", status: "Terminé (2-1)", day: "history" },
+            { id: 558568, competition: "Serie A", home_team: "Genoa CFC", away_team: "Venezia FC", status: "Terminé (1-0)", day: "history" },
+            { id: 558855, competition: "Eredivisie", home_team: "AZ Alkmaar", away_team: "FC Twente", status: "Terminé (2-2)", day: "history" },
+            { id: 558859, competition: "Eredivisie", home_team: "Fortuna Sittard", away_team: "SBV Excelsior", status: "Terminé (3-1)", day: "history" }
         ];
 
         let currentFilter = 'all';
@@ -403,6 +407,7 @@
                 const away = m.away_team || 'Extérieur';
                 const comp = m.competition || 'Championnat';
                 const id = m.id || 1;
+                const status = m.status || 'En direct';
 
                 const prono = calculatePrediction(home, away, id);
 
@@ -411,7 +416,7 @@
                         <div>
                             <div class="card-header">
                                 <span>${comp}</span>
-                                <span>En direct</span>
+                                <span style="color: ${status.includes('Terminé') ? '#8C8C8C' : '#FF0033'}; font-weight:700;">${status}</span>
                             </div>
                             <div class="teams">${home} <span style="color:var(--accent-red)">VS</span> ${away}</div>
                             
@@ -447,23 +452,47 @@
             const activeBtn = document.getElementById('btn-' + tab);
             if (activeBtn) activeBtn.classList.add('active');
 
+            const titleEl = document.getElementById('sectionTitle');
+
             if (tab === 'stats') {
+                if(titleEl) titleEl.innerText = "Statistiques Globales";
                 document.getElementById('predictionsGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--accent-red); margin-bottom: 1rem; font-family: 'Cinzel', serif; font-size: 1.8rem;">STATISTIQUES GLOBALES</h3>
-                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total matchs synchronisés : <strong>${allMatches.length}</strong></p>
+                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total matchs enregistrés : <strong>${allMatches.length}</strong></p>
                         <p style="color: var(--text-muted);">Moteur de pronostics IA opérationnel à 100%.</p>
                     </div>
                 `;
                 return;
             }
 
-            renderMatches(allMatches);
+            let filtered = allMatches;
+            if (tab === 'today') {
+                if(titleEl) titleEl.innerText = "Matchs d'Aujourd'hui";
+                filtered = allMatches.filter(m => m.day === 'today');
+            } else if (tab === 'tomorrow') {
+                if(titleEl) titleEl.innerText = "Matchs de Demain";
+                filtered = allMatches.filter(m => m.day === 'tomorrow');
+            } else if (tab === 'history') {
+                if(titleEl) titleEl.innerText = "Historique des Matchs";
+                filtered = allMatches.filter(m => m.day === 'history');
+            } else {
+                if(titleEl) titleEl.innerText = "Tous les Matchs & Pronostics IA";
+            }
+
+            renderMatches(filtered);
         }
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMatches.filter(m => {
+            const baseList = currentFilter === 'all' ? allMatches : allMatches.filter(m => {
+                if (currentFilter === 'today') return m.day === 'today';
+                if (currentFilter === 'tomorrow') return m.day === 'tomorrow';
+                if (currentFilter === 'history') return m.day === 'history';
+                return true;
+            });
+
+            const filtered = baseList.filter(m => {
                 const comp = (m.competition || '').toLowerCase();
                 const home = (m.home_team || '').toLowerCase();
                 const away = (m.away_team || '').toLowerCase();
@@ -472,8 +501,8 @@
             renderMatches(filtered);
         }
 
-        // Lancement direct de l'affichage
-        renderMatches(allMatches);
+        // Lancement direct
+        filterTab('all');
     </script>
 </body>
 </html>
