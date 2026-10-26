@@ -331,37 +331,47 @@
             <p>Analyse automatisée et prédictions algorithmiques en temps réel.</p>
         </div>
 
-        <div class="section-title" id="sectionTitle">Matchs & Pronostics IA</div>
+        <div class="section-title" id="sectionTitle">Tous les Matchs & Pronostics IA</div>
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Chargement des matchs...
+                Chargement...
             </div>
         </div>
     </main>
 
     <script>
-        // Répartition intelligente des matchs par catégorie temporelle
+        // Génération automatique des dates dynamiques (Aujourd'hui, Hier, Demain)
+        const now = new Date();
+        const formatDate = (d) => d.toISOString().split('T')[0];
+
+        const todayStr = formatDate(now);
+
+        const yesterdayObj = new Date();
+        yesterdayObj.setDate(now.getDate() - 1);
+        const yesterdayStr = formatDate(yesterdayObj);
+
+        const tomorrowObj = new Date();
+        tomorrowObj.setDate(now.getDate() + 1);
+        const tomorrowStr = formatDate(tomorrowObj);
+
+        // Liste des matchs avec de vraies dates dynamiques
         const allMatches = [
-            // Aujourd'hui (Matchs 1 à 6)
-            { id: 555051, competition: "Campeonato Brasileiro", home_team: "Coritiba FBC", away_team: "Grêmio FBPA", status: "En direct", day: "today" },
-            { id: 555053, competition: "Campeonato Brasileiro", home_team: "CR Flamengo", away_team: "CA Mineiro", status: "En direct", day: "today" },
-            { id: 558559, competition: "Serie A", home_team: "Udinese Calcio", away_team: "AC Milan", status: "21:00", day: "today" },
-            { id: 558562, competition: "Serie A", home_team: "Atalanta BC", away_team: "Frosinone Calcio", status: "18:30", day: "today" },
-            { id: 559648, competition: "Ligue 1", home_team: "Paris Saint-Germain", away_team: "Olympique Lyonnais", status: "20:45", day: "today" },
-            { id: 559649, competition: "Ligue 1", home_team: "Olympique de Marseille", away_team: "Le Havre AC", status: "17:00", day: "today" },
+            // Matchs d'Aujourd'hui
+            { id: 1, competition: "Campeonato Brasileiro", home_team: "Coritiba FBC", away_team: "Grêmio FBPA", date: todayStr, time: "En direct" },
+            { id: 2, competition: "Campeonato Brasileiro", home_team: "CR Flamengo", away_team: "CA Mineiro", date: todayStr, time: "En direct" },
+            { id: 3, competition: "Serie A", home_team: "Udinese Calcio", away_team: "AC Milan", date: todayStr, time: "21:00" },
+            { id: 4, competition: "Ligue 1", home_team: "Paris Saint-Germain", away_team: "Olympique Lyonnais", date: todayStr, time: "20:45" },
 
-            // Demain (Matchs 7 à 11)
-            { id: 558563, competition: "Serie A", home_team: "Inter Milan", away_team: "Fiorentina", status: "Demain 20:45", day: "tomorrow" },
-            { id: 558566, competition: "Serie A", home_team: "Lecce", away_team: "Juventus FC", status: "Demain 18:30", day: "tomorrow" },
-            { id: 558856, competition: "Eredivisie", home_team: "Sparta Rotterdam", away_team: "AFC Ajax", status: "Demain 14:30", day: "tomorrow" },
-            { id: 558858, competition: "Eredivisie", home_team: "PSV Eindhoven", away_team: "Feyenoord", status: "Demain 16:45", day: "tomorrow" },
+            // Matchs de Demain
+            { id: 5, competition: "Serie A", home_team: "Inter Milan", away_team: "Fiorentina", date: tomorrowStr, time: "20:45" },
+            { id: 6, competition: "Serie A", home_team: "Lecce", away_team: "Juventus FC", date: tomorrowStr, time: "18:30" },
+            { id: 7, competition: "Eredivisie", home_team: "PSV Eindhoven", away_team: "Feyenoord", date: tomorrowStr, time: "16:45" },
 
-            // Historique / Terminés (Matchs 12 à 15)
-            { id: 555057, competition: "Campeonato Brasileiro", home_team: "Santos FC", away_team: "EC Bahia", status: "Terminé (2-1)", day: "history" },
-            { id: 558568, competition: "Serie A", home_team: "Genoa CFC", away_team: "Venezia FC", status: "Terminé (1-0)", day: "history" },
-            { id: 558855, competition: "Eredivisie", home_team: "AZ Alkmaar", away_team: "FC Twente", status: "Terminé (2-2)", day: "history" },
-            { id: 558859, competition: "Eredivisie", home_team: "Fortuna Sittard", away_team: "SBV Excelsior", status: "Terminé (3-1)", day: "history" }
+            // Matchs d'Hier (Historique)
+            { id: 8, competition: "Campeonato Brasileiro", home_team: "Santos FC", away_team: "EC Bahia", date: yesterdayStr, time: "Terminé (2-1)" },
+            { id: 9, competition: "Serie A", home_team: "Genoa CFC", away_team: "Venezia FC", date: yesterdayStr, time: "Terminé (1-0)" },
+            { id: 10, competition: "Eredivisie", home_team: "AZ Alkmaar", away_team: "FC Twente", date: yesterdayStr, time: "Terminé (2-2)" }
         ];
 
         let currentFilter = 'all';
@@ -396,7 +406,7 @@
             if (!dataToRender || dataToRender.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
-                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match trouvé</h3>
+                        <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match trouvé pour cette catégorie</h3>
                     </div>
                 `;
                 return;
@@ -407,7 +417,8 @@
                 const away = m.away_team || 'Extérieur';
                 const comp = m.competition || 'Championnat';
                 const id = m.id || 1;
-                const status = m.status || 'En direct';
+                const status = m.time || 'À venir';
+                const isFinished = status.includes('Terminé');
 
                 const prono = calculatePrediction(home, away, id);
 
@@ -416,7 +427,7 @@
                         <div>
                             <div class="card-header">
                                 <span>${comp}</span>
-                                <span style="color: ${status.includes('Terminé') ? '#8C8C8C' : '#FF0033'}; font-weight:700;">${status}</span>
+                                <span style="color: ${isFinished ? '#8C8C8C' : '#FF0033'}; font-weight:700;">${status}</span>
                             </div>
                             <div class="teams">${home} <span style="color:var(--accent-red)">VS</span> ${away}</div>
                             
@@ -440,7 +451,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer">PRONOSTIC VALIDE 🩸</div>
+                        <div class="card-footer">${isFinished ? 'MATCH TERMINÉ' : 'PRONOSTIC VALIDE 🩸'}</div>
                     </div>
                 `;
             }).join('');
@@ -459,7 +470,7 @@
                 document.getElementById('predictionsGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--accent-red); margin-bottom: 1rem; font-family: 'Cinzel', serif; font-size: 1.8rem;">STATISTIQUES GLOBALES</h3>
-                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total matchs enregistrés : <strong>${allMatches.length}</strong></p>
+                        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0.5rem;">Total matchs gérés : <strong>${allMatches.length}</strong></p>
                         <p style="color: var(--text-muted);">Moteur de pronostics IA opérationnel à 100%.</p>
                     </div>
                 `;
@@ -469,15 +480,16 @@
             let filtered = allMatches;
             if (tab === 'today') {
                 if(titleEl) titleEl.innerText = "Matchs d'Aujourd'hui";
-                filtered = allMatches.filter(m => m.day === 'today');
+                filtered = allMatches.filter(m => m.date === todayStr);
             } else if (tab === 'tomorrow') {
                 if(titleEl) titleEl.innerText = "Matchs de Demain";
-                filtered = allMatches.filter(m => m.day === 'tomorrow');
+                filtered = allMatches.filter(m => m.date === tomorrowStr);
             } else if (tab === 'history') {
-                if(titleEl) titleEl.innerText = "Historique des Matchs";
-                filtered = allMatches.filter(m => m.day === 'history');
+                if(titleEl) titleEl.innerText = "Historique des Matchs (Passés)";
+                filtered = allMatches.filter(m => m.date < todayStr);
             } else {
                 if(titleEl) titleEl.innerText = "Tous les Matchs & Pronostics IA";
+                filtered = allMatches;
             }
 
             renderMatches(filtered);
@@ -485,12 +497,10 @@
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const baseList = currentFilter === 'all' ? allMatches : allMatches.filter(m => {
-                if (currentFilter === 'today') return m.day === 'today';
-                if (currentFilter === 'tomorrow') return m.day === 'tomorrow';
-                if (currentFilter === 'history') return m.day === 'history';
-                return true;
-            });
+            let baseList = allMatches;
+            if (currentFilter === 'today') baseList = allMatches.filter(m => m.date === todayStr);
+            else if (currentFilter === 'tomorrow') baseList = allMatches.filter(m => m.date === tomorrowStr);
+            else if (currentFilter === 'history') baseList = allMatches.filter(m => m.date < todayStr);
 
             const filtered = baseList.filter(m => {
                 const comp = (m.competition || '').toLowerCase();
@@ -501,7 +511,7 @@
             renderMatches(filtered);
         }
 
-        // Lancement direct
+        // Lancement initial sur l'Accueil
         filterTab('all');
     </script>
 </body>
