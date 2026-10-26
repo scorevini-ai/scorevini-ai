@@ -14,7 +14,6 @@
             --border-color: #2b0a0a;
             --text-main: #FFFFFF;
             --text-muted: #8C8C8C;
-            --green: #4ade80;
             --gold: #f0b13c;
         }
 
@@ -67,7 +66,6 @@
 
         main { flex: 1; padding: 2.5rem; overflow-y: auto; }
 
-        /* Onglets dates */
         .sx-tabs { display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; }
         .sx-tab { background: none; border: 0; cursor: pointer; text-align: center; color: var(--text-muted); font-family: inherit; padding: 0; }
         .sx-tab b { display: block; font-size: 18px; font-weight: 700; }
@@ -75,7 +73,6 @@
         .sx-tab.active { color: var(--text-main); }
         .sx-tab.active b { color: var(--accent-red); text-shadow: 0 0 10px rgba(255, 0, 51, 0.5); }
 
-        /* Barre de recherche */
         .sx-filters { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 30px; }
         .sx-input {
             width: 100%; background: #030303; border: 1px solid var(--border-color); border-radius: 8px;
@@ -83,7 +80,6 @@
         }
         .sx-input:focus { border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 0, 51, 0.3); }
 
-        /* Grille des cartes */
         .hp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
         .hp-card {
             background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-red);
@@ -140,7 +136,6 @@
     </aside>
 
     <main>
-        <!-- Onglets de dates dynamiques -->
         <div class="sx-tabs" id="sxTabs">
             <button class="sx-tab" onclick="filterByDate('history', this)"><b>Hier</b><span id="date-yest"></span></button>
             <button class="sx-tab active" onclick="filterByDate('today', this)"><b>Aujourd'hui</b><span id="date-today"></span></button>
@@ -156,38 +151,50 @@
 
     <script>
         const mois = ['JANV.','FÉVR.','MARS','AVR.','MAI','JUIN','JUIL.','AOÛT','SEPT.','OCT.','NOV.','DÉC.'];
-        const now = new Date();
         
+        const now = new Date();
+        const formatDate = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const todayStr = formatDate(now);
+
         const yest = new Date(); yest.setDate(now.getDate() - 1);
+        const yestStr = formatDate(yest);
+
         const tom = new Date(); tom.setDate(now.getDate() + 1);
+        const tomStr = formatDate(tom);
 
         document.getElementById('date-yest').textContent = yest.getDate() + ' ' + mois[yest.getMonth()];
         document.getElementById('date-today').textContent = now.getDate() + ' ' + mois[now.getMonth()];
         document.getElementById('date-tom').textContent = tom.getDate() + ' ' + mois[tom.getMonth()];
 
         const matchesDatabase = [
-            { id: 101, category: 'history', league: 'Serie A', time: 'Terminé', home: 'Udinese Calcio', away: 'AC Milan', winTeam: 'away', pick: 'AC Milan ou Nul', pct: 82, opts: {'1X':45, '12':78, 'X2':82}, activeOpt: 'X2' },
-            { id: 102, category: 'history', league: 'Campeonato Brasileiro', time: 'Terminé (2-1)', home: 'Santos FC', away: 'EC Bahia', winTeam: 'home', pick: 'Santos FC ou Nul', pct: 75, opts: {'1X':75, '12':70, 'X2':50}, activeOpt: '1X' },
-            { id: 103, category: 'history', league: 'Serie A', time: 'Terminé (1-0)', home: 'Genoa CFC', away: 'Venezia FC', winTeam: 'home', pick: 'Genoa CFC ou Nul', pct: 79, opts: {'1X':79, '12':72, 'X2':48}, activeOpt: '1X' },
+            { id: 101, date: yestStr, league: 'Serie A', time: 'Terminé', home: 'Udinese Calcio', away: 'AC Milan', winTeam: 'away', pick: 'AC Milan ou Nul', pct: 82, opts: {'1X':45, '12':78, 'X2':82}, activeOpt: 'X2' },
+            { id: 102, date: yestStr, league: 'Campeonato Brasileiro', time: 'Terminé (2-1)', home: 'Santos FC', away: 'EC Bahia', winTeam: 'home', pick: 'Santos FC ou Nul', pct: 75, opts: {'1X':75, '12':70, 'X2':50}, activeOpt: '1X' },
+            { id: 103, date: yestStr, league: 'Serie A', time: 'Terminé (1-0)', home: 'Genoa CFC', away: 'Venezia FC', winTeam: 'home', pick: 'Genoa CFC ou Nul', pct: 79, opts: {'1X':79, '12':72, 'X2':48}, activeOpt: '1X' },
+            { id: 104, date: yestStr, league: 'Serie A', time: 'Terminé (0-1)', home: 'Inter Milan', away: 'Fiorentina', winTeam: 'away', pick: 'Fiorentina ou Nul', pct: 84, opts: {'1X':40, '12':75, 'X2':84}, activeOpt: 'X2' },
 
-            { id: 1, category: 'today', league: 'Campeonato Brasileiro', time: 'En direct', home: 'Coritiba FBC', away: 'Grêmio FBPA', winTeam: 'home', pick: 'Coritiba FBC ou Nul', pct: 85, opts: {'1X':85, '12':78, 'X2':52}, activeOpt: '1X' },
-            { id: 2, category: 'today', league: 'Serie A', time: '18:30', home: 'Atalanta BC', away: 'Frosinone Calcio', winTeam: 'home', pick: 'Atalanta BC ou Nul', pct: 88, opts: {'1X':88, '12':80, 'X2':40}, activeOpt: '1X' },
-            { id: 3, category: 'today', league: 'Ligue 1', time: '20:45', home: 'Paris Saint-Germain', away: 'Olympique Lyonnais', winTeam: 'home', pick: 'Paris Saint-Germain ou Nul', pct: 91, opts: {'1X':91, '12':85, 'X2':30}, activeOpt: '1X' },
-            { id: 4, category: 'today', league: 'Serie A', time: '21:00', home: 'Inter Milan', away: 'Fiorentina', winTeam: 'home', pick: 'Inter Milan ou Match Nul', pct: 84, opts: {'1X':84, '12':75, 'X2':50}, activeOpt: '1X' },
+            { id: 1, date: todayStr, league: 'Campeonato Brasileiro', time: 'En direct', home: 'Coritiba FBC', away: 'Grêmio FBPA', winTeam: 'home', pick: 'Coritiba FBC ou Nul', pct: 85, opts: {'1X':85, '12':78, 'X2':52}, activeOpt: '1X' },
+            { id: 2, date: todayStr, league: 'Serie A', time: '18:30', home: 'Atalanta BC', away: 'Frosinone Calcio', winTeam: 'home', pick: 'Atalanta BC ou Nul', pct: 88, opts: {'1X':88, '12':80, 'X2':40}, activeOpt: '1X' },
+            { id: 3, date: todayStr, league: 'Ligue 1', time: '20:45', home: 'Paris Saint-Germain', away: 'Olympique Lyonnais', winTeam: 'home', pick: 'Paris Saint-Germain ou Nul', pct: 91, opts: {'1X':91, '12':85, 'X2':30}, activeOpt: '1X' },
 
-            { id: 201, category: 'tomorrow', league: 'Campeonato Brasileiro', time: 'Demain 01:00', home: 'CR Flamengo', away: 'CA Mineiro', winTeam: 'home', pick: 'CR Flamengo ou Nul', pct: 86, opts: {'1X':86, '12':80, 'X2':45}, activeOpt: '1X' },
-            { id: 202, category: 'tomorrow', league: 'Serie A', time: 'Demain 18:30', home: 'US Lecce', away: 'Juventus FC', winTeam: 'away', pick: 'Juventus FC ou Nul', pct: 89, opts: {'1X':40, '12':75, 'X2':89}, activeOpt: 'X2' },
-            { id: 203, category: 'tomorrow', league: 'Eredivisie', time: 'Demain 14:30', home: 'Sparta Rotterdam', away: 'AFC Ajax', winTeam: 'away', pick: 'AFC Ajax ou Nul', pct: 80, opts: {'1X':50, '12':72, 'X2':80}, activeOpt: 'X2' }
+            { id: 201, date: tomStr, league: 'Campeonato Brasileiro', time: '01:00', home: 'CR Flamengo', away: 'CA Mineiro', winTeam: 'home', pick: 'CR Flamengo ou Nul', pct: 86, opts: {'1X':86, '12':80, 'X2':45}, activeOpt: '1X' },
+            { id: 202, date: tomStr, league: 'Serie A', time: '18:30', home: 'US Lecce', away: 'Juventus FC', winTeam: 'away', pick: 'Juventus FC ou Nul', pct: 89, opts: {'1X':40, '12':75, 'X2':89}, activeOpt: 'X2' },
+            { id: 203, date: tomStr, league: 'Eredivisie', time: '14:30', home: 'Sparta Rotterdam', away: 'AFC Ajax', winTeam: 'away', pick: 'AFC Ajax ou Nul', pct: 80, opts: {'1X':50, '12':72, 'X2':80}, activeOpt: 'X2' }
         ];
 
-        let currentFilter = 'today';
+        let currentTab = 'today';
 
         function renderMatches(data) {
             const grid = document.getElementById('hpGrid');
             if (!grid) return;
 
             if (!data || data.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">Aucun match trouvé.</div>`;
+                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">Aucun match pour cette date. Le système s'actualise automatiquement.</div>`;
                 return;
             }
 
@@ -204,7 +211,7 @@
                             </div>
                             <div class="hp-meta">
                                 <span>${m.league}</span>
-                                <span style="color:var(--accent-red); font-weight:700;">${m.time}</span>
+                                <span style="color:var(--accent-red); font-weight:700;">${m.time} (${m.date})</span>
                             </div>
                             <div class="hp-teams">
                                 <div class="hp-team ${homeWin}"><div class="hp-logo">🏠</div><span>${m.home}</span></div>
@@ -228,12 +235,19 @@
             }).join('');
         }
 
-        function filterByDate(category, btnElement) {
-            currentFilter = category;
+        function filterByDate(type, btnElement) {
+            currentTab = type;
             document.querySelectorAll('.sx-tabs .sx-tab').forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
 
-            const filtered = matchesDatabase.filter(m => m.category === category);
+            let filtered = [];
+            if (type === 'history') {
+                filtered = matchesDatabase.filter(m => m.date < todayStr);
+            } else if (type === 'today') {
+                filtered = matchesDatabase.filter(m => m.date === todayStr);
+            } else if (type === 'tomorrow') {
+                filtered = matchesDatabase.filter(m => m.date === tomStr);
+            }
             renderMatches(filtered);
         }
 
@@ -245,23 +259,23 @@
                 document.getElementById('hpGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px;">
                         <h3 style="color: var(--accent-red); font-family: 'Cinzel', serif; font-size: 1.8rem; margin-bottom:1rem;">STATISTIQUES GLOBALES</h3>
-                        <p style="font-size: 1.2rem;">Total matchs analysés : <strong>${matchesDatabase.length}</strong></p>
-                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Moteur de prédiction IA actif à 100%.</p>
+                        <p style="font-size: 1.2rem;">Total matchs gérés par le moteur : <strong>${matchesDatabase.length}</strong></p>
+                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Date active du système : <strong>${todayStr}</strong></p>
                     </div>
                 `;
                 return;
             }
 
             if (tab === 'history') {
-                renderMatches(matchesDatabase.filter(m => m.category === 'history'));
+                renderMatches(matchesDatabase.filter(m => m.date < todayStr));
                 return;
             }
             if (tab === 'today') {
-                renderMatches(matchesDatabase.filter(m => m.category === 'today'));
+                renderMatches(matchesDatabase.filter(m => m.date === todayStr));
                 return;
             }
             if (tab === 'tomorrow') {
-                renderMatches(matchesDatabase.filter(m => m.category === 'tomorrow'));
+                renderMatches(matchesDatabase.filter(m => m.date === tomStr));
                 return;
             }
 
@@ -270,16 +284,18 @@
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = matchesDatabase.filter(m => {
-                const matchCategory = (currentFilter === 'all') || (m.category === currentFilter);
-                const matchSearch = m.home.toLowerCase().includes(query) || m.away.toLowerCase().includes(query) || m.league.toLowerCase().includes(query);
-                return matchCategory && matchSearch;
+            let baseList = matchesDatabase;
+            if (currentTab === 'history') baseList = matchesDatabase.filter(m => m.date < todayStr);
+            else if (currentTab === 'today') baseList = matchesDatabase.filter(m => m.date === todayStr);
+            else if (currentTab === 'tomorrow') baseList = matchesDatabase.filter(m => m.date === tomStr);
+
+            const filtered = baseList.filter(m => {
+                return m.home.toLowerCase().includes(query) || m.away.toLowerCase().includes(query) || m.league.toLowerCase().includes(query);
             });
             renderMatches(filtered);
         }
 
-        // Chargement initial des matchs d'aujourd'hui
-        renderMatches(matchesDatabase.filter(m => m.category === 'today'));
+        renderMatches(matchesDatabase.filter(m => m.date === todayStr));
     </script>
 </body>
 </html>
