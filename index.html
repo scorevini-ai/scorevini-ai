@@ -335,7 +335,7 @@
 
         <div class="grid" id="predictionsGrid">
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
-                Chargement des matchs...
+                Récupération automatique des matchs depuis Supabase...
             </div>
         </div>
     </main>
@@ -344,18 +344,7 @@
         const supabaseUrl = "https://tqtkzkqampddxacmstk.supabase.co";
         const supabaseKey = "sb_publishable_KyUSPjb3kZ-exriMinWgOg_8Jck1VNa";
 
-        // Données de base intégrées (secours immédiat)
-        const fallbackMatches = [
-            { competition: "Serie A", home_team: "Udinese Calcio", away_team: "AC Milan", id: 558559 },
-            { competition: "Serie A", home_team: "Atalanta BC", away_team: "Frosinone Calcio", id: 558562 },
-            { competition: "Serie A", home_team: "FC Internazionale Milano", away_team: "ACF Fiorentina", id: 558563 },
-            { competition: "Ligue 1", home_team: "Paris Saint-Germain FC", away_team: "Olympique Lyonnais", id: 559648 },
-            { competition: "Ligue 1", home_team: "Olympique de Marseille", away_team: "Le Havre AC", id: 559649 },
-            { competition: "Campeonato Brasileiro Série A", home_team: "Coritiba FBC", away_team: "Grêmio FBPA", id: 555051 },
-            { competition: "Campeonato Brasileiro Série A", home_team: "CR Flamengo", away_team: "CA Mineiro", id: 555053 }
-        ];
-
-        let allMatches = [...fallbackMatches];
+        let allMatches = [];
         let currentFilter = 'all';
 
         function calculatePrediction(homeTeam, awayTeam, matchId) {
@@ -381,10 +370,7 @@
             return { mainProno, goalsProno, bttsProno, confidence };
         }
 
-        async function loadDataDirect() {
-            // Affichage immédiat des matchs par défaut
-            renderMatches(allMatches);
-
+        async function loadDataFromSupabase() {
             try {
                 const response = await fetch(`${supabaseUrl}/rest/v1/matches?select=*`, {
                     headers: {
@@ -393,15 +379,21 @@
                     }
                 });
 
-                if (response.ok) {
-                    const fetchedData = await response.json();
-                    if (fetchedData && fetchedData.length > 0) {
-                        allMatches = fetchedData;
-                        renderMatches(allMatches);
-                    }
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
                 }
+
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    allMatches = data;
+                } else {
+                    allMatches = [];
+                }
+                filterTab(currentFilter);
             } catch (e) {
-                console.warn("Utilisation du mode hors-ligne / secours local");
+                console.error("Erreur de connexion Supabase :", e);
+                allMatches = [];
+                filterTab(currentFilter);
             }
         }
 
@@ -413,6 +405,7 @@
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;">
                         <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: 'Cinzel', serif;">Aucun match trouvé</h3>
+                        <p style="color: var(--text-muted);">La table Supabase ne renvoie aucun enregistrement pour le moment.</p>
                     </div>
                 `;
                 return;
@@ -492,7 +485,7 @@
             renderMatches(filtered);
         }
 
-        loadDataDirect();
+        loadDataFromSupabase();
     </script>
 </body>
 </html>
